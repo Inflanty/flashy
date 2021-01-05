@@ -19,19 +19,22 @@ class Word:
     ## Word constructor
     #  @param Name of the database to connect/create
     def __init__(self, name) :
+        self.name = "NONE"
         if name == 'mem' :
             self.name = ':memory:'
+        elif ".db" in name:
+            self.name = name
+            self.tableName = "record"
+            self.connDB = sqlite3.connect(str(self.name))
+            self.cursorDB = self.connDB.cursor()
+            self.initDB()
         else :
-            self.name = name + '.db'
-        self.tableName = "record"
-        self.connDB = sqlite3.connect(str(self.name))
-        self.cursorDB = self.connDB.cursor()
-        self.initDB()
+            print(name + " is not .db file")
+            exit
     
     ## Word destructor
     def __del__(self) :
-        self.connDB.close()
-        print('Connection to ' + self.name + ' closed!')
+        self.closeConnection()
 
     ## Database init
     #  @brief This methow create database if not exist,
@@ -49,7 +52,9 @@ class Word:
                 )""")
             self.connDB.commit()
         except sqlite3.OperationalError:
-            print('Table words exist!')
+            print("Table words exist!")
+        except sqlite3.DatabaseError:
+            print("File is not a database")
 
     ## Get column names from database
     #  @return list with columns name
@@ -213,3 +218,11 @@ class Word:
         table = self.cursorDB.fetchall()
         for i in table :
             print(i)
+
+    ## Close connection to database
+    def closeConnection(self) :
+        try :
+            self.connDB.close()
+            print('Connection to ' + self.name + ' closed!')
+        except AttributeError:
+            pass
