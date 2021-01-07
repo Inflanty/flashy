@@ -19,6 +19,7 @@ class GUI :
         self.ui.setupUi(self.MainWindow)
         self.onTriggerHook()
         self.MainWindowApp.lastWindowClosed.connect(self.exit)
+        #pyqtgraph.examples.run()
         self.MainWindow.show()
         sys.exit(self.MainWindowApp.exec_())
 
@@ -33,6 +34,7 @@ class GUI :
     def onTriggerHook(self) :
         self.ui.actionExit.triggered.connect(lambda: self.exit())
         self.ui.actiondatabase.triggered.connect(lambda: self.fileNameOpen())
+        self.ui.menuImport.triggered.connect(lambda: self.importData())
 
     def fileNameOpen(self) :
         currentPath = pathlib.Path().absolute()
@@ -49,6 +51,28 @@ class GUI :
         self.ui.graphicWidget.setLabel('bottom', 'Weeks', units='')
         # plot data: x, y values
         self.ui.graphicWidget.plot(self.database.getRange(), self.database.showProgress())
+
+    def updatePlot(self) :
+        self.ui.graphicWidget.plot(self.database.getRange(), self.database.showProgress())
+
+    def plotBarDatabase(self) :
+        # plot data: x, y values
+        self.ui.graphicWidget = pg.plot()
+        self.ui.graphicWidget.setTitle("Test Plot", color="w", size="8pt")
+        self.ui.graphicWidget.setLabel('left', 'Origins', units='')
+        self.ui.graphicWidget.setLabel('bottom', 'Weeks', units='')
+        bg1 = pg.BarGraphItem(x=self.database.getRange(), height=self.database.showProgress(), width=0.2, brush='g')
+        self.ui.graphicWidget.addItem(bg1)
+
+    def importData(self) :
+        if self.database == "NULL" : 
+            print("Open database first!")
+        else :
+            currentPath = pathlib.Path().absolute()
+            self.fileName = QtWidgets.QFileDialog()
+            opentFileName = self.fileName.getOpenFileName(self.fileName, "Import File", str(currentPath), "CSV Files (*.csv)")
+            self.database.addProgress(str(opentFileName[0]))
+            self.updatePlot()
 
     def exit(self) :
         print("Exit")
