@@ -1,28 +1,55 @@
-import sqlite3
-import csv
-from tkinter import *
-from CStats import Statistics
-from CWord import Word
+# -*- coding: utf-8 -*-
+"""
+Demonstrates use of PlotWidget class. This is little more than a 
+GraphicsView with a PlotItem placed in its center.
+"""
+from pyqtgraph.Qt import QtGui, QtCore
+import numpy as np
+import pyqtgraph as pg
 
-test = Statistics("mem")
-test.addProgress("l1.csv")
-test.addProgress("l2.csv")
-test.addProgress("l3.csv")
-#test.saveProgressGraph("progress.png")
+#QtGui.QApplication.setGraphicsSystem('raster')
+app = pg.mkQApp()
+mw = QtGui.QMainWindow()
+mw.setWindowTitle('pyqtgraph example: PlotWidget')
+mw.resize(800,800)
+cw = QtGui.QWidget()
+mw.setCentralWidget(cw)
+l = QtGui.QVBoxLayout()
+cw.setLayout(l)
 
-#test = Word("mem")
-#test.importCSV("l4.csv")
-#line = []
-#IDs = test.getLectureIDs(4)
-#for row in IDs :
-#    line.append(test.getSentenceByID(row[0]) + "\t [" + test.getTransByID(row[0]) + "]")
-#
-#gui = Tk()
-#ix = 0
-#for row in line :
-#    Label(gui, text=row).grid(row=ix)
-#    entryName = "E_" + str(ix)
-#    entryName = Entry(gui)
-#    entryName.grid(row=str(ix), column=1)
-#    ix = ix + 1
-#mainloop() 
+pw = pg.PlotWidget(name='Plot1')  ## giving the plots names allows us to link their axes together
+l.addWidget(pw)
+pw2 = pg.PlotWidget(name='Plot2')
+l.addWidget(pw2)
+pw3 = pg.PlotWidget()
+l.addWidget(pw3)
+
+mw.show()
+
+## Create an empty plot curve to be filled later, set its pen
+p1 = pw.plot()
+p1.setPen((200,200,100))
+
+pw.setLabel('left', 'Value', units='V')
+pw.setLabel('bottom', 'Time', units='s')
+pw.setXRange(0, 2)
+pw.setYRange(0, 1e-10)
+
+## Test large numbers
+curve = pw3.plot(np.random.normal(size=100)*1e0, clickable=True)
+curve.curve.setClickable(True)
+curve.setPen('w')  ## white pen
+curve.setShadowPen(pg.mkPen((70,70,30), width=6, cosmetic=True))
+
+
+lr = pg.LinearRegionItem([1, 30], bounds=[0,100], movable=True)
+pw3.addItem(lr)
+line = pg.InfiniteLine(angle=90, movable=True)
+pw3.addItem(line)
+line.setBounds([0,200])
+
+## Start Qt event loop unless running in interactive mode or using pyside.
+if __name__ == '__main__':
+    import sys
+    if (sys.flags.interactive != 1) or not hasattr(QtCore, 'PYQT_VERSION'):
+        QtGui.QApplication.instance().exec_()
