@@ -18,6 +18,10 @@ class Statistics:
         else :
             print("File " + str(fileName) + " does not exist!")
 
+    def getRange(self):
+        weeks = list(range(0, (self.database.getLectureID() + 1)))
+        return weeks
+
     def showProgress(self):
         lectures = self.database.getLectureID()
         progress = []
@@ -51,3 +55,11 @@ class Statistics:
 
     def countRecordsByDate(self, date):
         pass
+
+
+if __name__ == "__main__":
+    # TEST
+    # Take a data from DB
+    database = Statistics("words.db")
+    data = database.showProgress()
+    print(data)
