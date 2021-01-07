@@ -1,6 +1,5 @@
 import sys
 import pathlib
-import time
 from PyQt5 import QtCore, QtGui, QtWidgets
 from pyqtgraph import PlotWidget, plot
 import pyqtgraph as pg
