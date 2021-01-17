@@ -161,7 +161,10 @@ class Word:
     def addRecord(self, row) :
         if (len(row) == 5) and not ("#" in row[0]):
             newID = self.getLastID() + 1
-            link = "https://www.diki.pl/slownik-angielskiego?q=" + str(row[1].lower()).replace(" ", "+")
+            if row[4] != "IT" :
+                link = "https://www.diki.pl/slownik-angielskiego?q=" + str(row[1].lower()).replace(" ", "+")
+            else :
+                link = "NULL"
             with self.connDB:
                 self.cursorDB.execute("INSERT INTO " + self.tableName + " VALUES (:originID, :lectureID, :origin, :sentence, :trans, :category, :dikiLink)",
                         {'originID' : newID,
