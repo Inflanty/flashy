@@ -33,6 +33,12 @@ class Statistics:
                 progress.append(self.database.getLectureProgress(lectureID) + progress[lectureID - 1])
         return progress
 
+    def deleteLecturesRecords(self, lectureID) :
+        lecturesIDs = self.database.getLectureIDs(lectureID)
+        for row in lecturesIDs :
+            print(row[0])
+            self.database.deleteRecord(row[0])
+
     def showProgressGraph(self):
         x = [0,1,2,3]
         y = self.showProgress()
