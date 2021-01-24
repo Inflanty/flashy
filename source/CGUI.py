@@ -1,6 +1,7 @@
 import sys
 import pathlib
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtWidgets import QMessageBox, QComboBox, QListWidget
 from pyqtgraph import PlotWidget, plot
 import pyqtgraph as pg
 import pyqtgraph.examples
@@ -9,8 +10,12 @@ from CMainWindow import Ui_MainWindow
 from CFileBrowser import Ui_FileBrowser
 from CStats import Statistics
 
+
+# For MainWindow geneate :  pyuic5 -x  .\mainwindow.ui -o ..\..\source\CMainWindow.py
+
 class GUI :
     database = "NULL"
+    testme = []
 
     def __init__(self):
         self.MainWindowApp = QtWidgets.QApplication(sys.argv)
@@ -35,13 +40,38 @@ class GUI :
         self.ui.actionExit.triggered.connect(lambda: self.exit())
         self.ui.actiondatabase.triggered.connect(lambda: self.fileNameOpen())
         self.ui.menuImport.triggered.connect(lambda: self.importData())
+        # self.ui.actionEdit.triggered.connect(lambda: self.popupEdit())
 
     def fileNameOpen(self) :
-        currentPath = pathlib.Path().absolute()
-        self.fileName = QtWidgets.QFileDialog()
-        opentFileName = self.fileName.getOpenFileName(self.fileName, "Open File", str(currentPath), "Database Files (*.db)")
-        self.database = Statistics(str(opentFileName[0]))
-        self.plotDatabase()
+        if self.database == "NULL" :   
+            currentPath = pathlib.Path().absolute()
+            self.fileName = QtWidgets.QFileDialog()
+            opentFileName = self.fileName.getOpenFileName(self.fileName, "Open File", str(currentPath), "Database Files (*.db)")
+            self.database = Statistics(str(opentFileName[0]))
+            self.plotDatabase()
+            self.createActionOnEdit(self.database.getRange())
+        else :
+            print("Database exist!")
+
+    def createActionOnEdit(self, lectureList) :
+        # First edit existing action
+        self.ui.name = []
+        self.ui.name.append(self.ui.action)
+        self.ui.name[0] = self.ui.action
+        if len(lectureList) > 2 :
+            for i in range(1, len(lectureList) + 1) :
+                if i != 1 :
+                    self.ui.name.append(QtWidgets.QAction(self.MainWindow))
+                self.ui.name[i - 1].setObjectName("Lecture " + str(i))
+                self.ui.menuEdit.addAction(self.ui.name[i - 2])
+                self.ui.name[i - 1].setText(QtCore.QCoreApplication.translate("MainWindow", "Lecture " + str(i)))
+                self.ui.name[i - 1].triggered.connect(self.lectureEdit)
+
+    def lectureEdit(self) :
+        # Make sure whitch lecture has been choosen
+        sender = self.MainWindow.sender()
+        print(sender.objectName())
+        # Use : https://gist.github.com/Axel-Erfurt/582d53fc24abb4f267a4c6e5df486e02 for editing CSV files ?
 
     def plotDatabase(self) :
         self.ui.graphicWidget = pg.PlotWidget()
@@ -52,7 +82,7 @@ class GUI :
         # plot data: x, y values
         self.ui.graphicWidget.plot(self.database.getRange(), self.database.showProgress())
 
-    def updatePlot(self) :
+    def plotDatabaseUpdate(self) :
         self.ui.graphicWidget.plot(self.database.getRange(), self.database.showProgress())
 
     def plotBarDatabase(self) :
@@ -72,7 +102,27 @@ class GUI :
             self.fileName = QtWidgets.QFileDialog()
             opentFileName = self.fileName.getOpenFileName(self.fileName, "Import File", str(currentPath), "CSV Files (*.csv)")
             self.database.addProgress(str(opentFileName[0]))
-            self.updatePlot()
+            self.plotDatabaseUpdate()
+
+    def popupEdit(self) :
+        if self.database == "NULL" : 
+            print("Open database first!")
+        else :
+            self.listwidget = QListWidget()
+            for i in range(1, len(self.database.getRange())) :
+                self.listwidget.insertItem(0, "Lecture " + str(i))
+            self.listwidget.clicked.connect(self.clicked)
+            self.listwidget.show()
+
+    def clicked(self) :
+        item = self.listwidget.currentItem()
+        print(item.text())
+        self.listwidget.close()
+
+    def deleteData(self, lecture) :
+        # Add popup to edit (chosse the lecture id from list5 list )
+        self.database.deleteLecturesRecords(lecture)
+        self.plotDatabaseUpdate()
 
     def exit(self) :
         print("Exit")
