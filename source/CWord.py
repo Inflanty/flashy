@@ -11,6 +11,7 @@
 import sqlite3
 import csv
 import time
+import CSVReader
 
 ## Documentation for a class.
 #
@@ -206,14 +207,21 @@ class Word:
         toc = time.perf_counter()
         print(f"Imported CSV file in {toc - tic:0.4f} seconds")
 
+    ## Export row to CSV file
+    #  @param lectureID
+    #  @param row
+    #  The row has to be in right format here
+    def exportCSV(self) :
+        CSVReader.run()
+
     ## Swow single row
     #  @param row to print
     def show(self, row) :
         elements = ""
         if (row != "ALL") :
-            elements = " WHEN originID = " + str(row)
+            elements = " WHERE originID = " + str(row)
         self.cursorDB.execute("SELECT * FROM " + self.tableName + elements)
-        print(self.cursorDB.fetchall())
+        return self.cursorDB.fetchall()
 
     ## Present entire Database
     def present(self) :

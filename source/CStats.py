@@ -22,6 +22,9 @@ class Statistics:
         weeks = list(range(0, (self.database.getLectureID() + 1)))
         return weeks
 
+    def getRecordsNumber(self) :
+        return self.database.getLastID()
+
     def showProgress(self):
         lectures = self.database.getLectureID()
         progress = []
@@ -32,6 +35,9 @@ class Statistics:
             else :
                 progress.append(self.database.getLectureProgress(lectureID) + progress[lectureID - 1])
         return progress
+
+    def showHeader(self) :
+        return self.database.getColumnNames()
 
     def deleteLecturesRecords(self, lectureID) :
         lecturesIDs = self.database.getLectureIDs(lectureID)
@@ -59,8 +65,19 @@ class Statistics:
         plt.winter()
         plt.savefig(fileName, bbox_inches='tight')        
 
-    def countRecordsByDate(self, date):
-        pass
+    def countRecordsByLecture(self, lectureID):
+        return len(self.database.getLectureIDs(lectureID))
+
+    def editRecords(self) :
+        self.database.exportCSV()
+
+    def getRecordFromLecture(self, lectureID, row) :
+        lectureIDs = self.database.getLectureIDs(lectureID)
+        return self.database.show(lectureIDs[0][0] + row)
+
+    def getAllRecords(self) :
+        return self.database.show('ALL')
+
 
 
 if __name__ == "__main__":

@@ -9,6 +9,8 @@ import pyqtgraph.examples
 from CMainWindow import Ui_MainWindow
 from CFileBrowser import Ui_FileBrowser
 from CStats import Statistics
+from CSVReader import MyWindow
+from CDatabaseEdit import DatabaseEdit
 
 
 # For MainWindow geneate :  pyuic5 -x  .\mainwindow.ui -o ..\..\source\CMainWindow.py
@@ -32,6 +34,7 @@ class GUI :
         print("Bye")
         if self.database != "NULL" :
             self.database.closeConnection()
+            self.database = "NULL"
         else :
             pass
         self.MainWindowApp.quit()
@@ -40,7 +43,7 @@ class GUI :
         self.ui.actionExit.triggered.connect(lambda: self.exit())
         self.ui.actiondatabase.triggered.connect(lambda: self.fileNameOpen())
         self.ui.menuImport.triggered.connect(lambda: self.importData())
-        # self.ui.actionEdit.triggered.connect(lambda: self.popupEdit())
+        self.ui.actionNew.triggered.connect(lambda: self.newLecture())
 
     def fileNameOpen(self) :
         if self.database == "NULL" :   
@@ -67,11 +70,41 @@ class GUI :
                 self.ui.name[i - 1].setText(QtCore.QCoreApplication.translate("MainWindow", "Lecture " + str(i)))
                 self.ui.name[i - 1].triggered.connect(self.lectureEdit)
 
+    # TODO: entire db edit
+    def dbEdit(self) :
+        pass
+
     def lectureEdit(self) :
-        # Make sure whitch lecture has been choosen
-        sender = self.MainWindow.sender()
-        print(sender.objectName())
-        # Use : https://gist.github.com/Axel-Erfurt/582d53fc24abb4f267a4c6e5df486e02 for editing CSV files ?
+        if self.database != "NULL" :
+            sender = self.MainWindow.sender()
+            lectureID = sender.objectName()
+            self.plotDatabaseClose()
+            self.data = DatabaseEdit(self.database, lectureID)
+            self.MainWindow.setCentralWidget(self.data.tabs)
+            self.data.databaseOpen()
+
+    def setData(self):
+        horHeaders = []
+        for n, key in enumerate(sorted(self.data.keys())):
+            horHeaders.append(key)
+            for m, item in enumerate(self.data[key]):
+                newitem = QTableWidgetItem(item)
+                self.tabs.setItem(m, n, newitem)
+        self.tabs.setHorizontalHeaderLabels(horHeaders)
+
+    def setDataFromLecture(self, lectureID) :
+        # TODO: Remove this uglyness
+        horHeaders = ["ID", "LectureID", "Word", "Sentence", "Transation", "Category"]
+        self.tabs.setHorizontalHeaderLabels(horHeaders)
+        for _rows in range(self.database.countRecordsByLecture(lectureID)) :
+            # TODO: Implement getRecordFromLecture()
+            _rowsContent = self.database.getRecordFromLecture(lectureID, _rows)
+            for _columns in range(len(_rowsContent[0]) - 1) :
+                newitem = QTableWidgetItem(str(_rowsContent[0][_columns]))
+                self.tabs.setItem(_rows, _columns, newitem)
+
+    def newLecture(self) :
+        print("New File..!")
 
     def plotDatabase(self) :
         self.ui.graphicWidget = pg.PlotWidget()
@@ -84,6 +117,9 @@ class GUI :
 
     def plotDatabaseUpdate(self) :
         self.ui.graphicWidget.plot(self.database.getRange(), self.database.showProgress())
+
+    def plotDatabaseClose(self) :
+        self.ui.graphicWidget.close()
 
     def plotBarDatabase(self) :
         # plot data: x, y values
