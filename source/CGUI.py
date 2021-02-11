@@ -78,7 +78,9 @@ class GUI :
         if self.database != "NULL" :
             sender = self.MainWindow.sender()
             lectureID = sender.objectName()
-            self.plotDatabaseClose()
+            
+            if(self.ui.graphicWidget.isActiveWindow()) :
+                self.plotDatabaseClose()
             self.data = DatabaseEdit(self.database, lectureID)
             self.MainWindow.setCentralWidget(self.data.tabs)
             self.data.databaseOpen()
