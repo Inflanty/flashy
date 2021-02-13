@@ -214,6 +214,31 @@ class Word:
     def exportCSV(self) :
         CSVReader.run()
 
+    ## Edit section in database
+    #  NOTE: Update only by lectureID for now
+    #  @param lectureID
+    #  @param data - entire and edited lectures data
+    def updateSection(self, lectureID, data) :
+        for _row in data :
+            self.updateRow(_row)
+
+    ## Edit row in database
+    #  @param row - row data (list)
+    #  The row has to be in right format here
+    def updateRow(self, row) :
+        with self.connDB:
+            try:
+                self.cursorDB.execute("""UPDATE """ + self.tableName + 
+                                      """ SET  trans = :trans, """ + 
+                                      """origin = :origin, """ +
+                                      """category = :category, """ +
+                                      """sentence = :sentence, """ +
+                                      """lectureID = :lectureID """ +
+                                      """ WHERE originID = :originID""",
+                                      {'originID': row[0], 'lectureID': row[1], 'origin':row[2], 'sentence': row[3], 'trans':row[4], 'category': row[5]})
+            except IndexError:
+                print("IndexError")
+
     ## Swow single row
     #  @param row to print
     def show(self, row) :

@@ -8,6 +8,8 @@ class DatabaseEdit :
         self.DBColumnCount = 6
         self.DBRowCount = self.database.countRecordsByLecture(self.lectureID)
         self.tabs = QTableWidget(self.DBRowCount, self.DBColumnCount)
+        self.tabs.updatesEnabled()
+        self.lecturesDataUpdated = []
 
     def __del__(self):
         pass
@@ -21,8 +23,10 @@ class DatabaseEdit :
     def dataPresent(self) :
         horHeaders = self.database.showHeader()
         self.tabs.setHorizontalHeaderLabels(horHeaders)
+        self.lectureContent = []
         for _rows in range(self.DBRowCount) :
             _rowsContent = self.database.getRecordFromLecture(self.lectureID, _rows)
+            self.lectureContent.append(_rowsContent)
             for _columns in range(len(_rowsContent[0]) - 1) :
                 newitem = QTableWidgetItem(str(_rowsContent[0][_columns]))
                 self.tabs.setItem(_rows, _columns, newitem)
@@ -56,3 +60,11 @@ class DatabaseEdit :
             for _columns in range(len(_rowsContent[0]) - 1) :
                 newitem = QTableWidgetItem(str(_rowsContent[0][_columns]))
                 self.tabs.setItem(_rows, _columns, newitem)
+
+    def updateDataFromLecture(self) :
+        _rowContent = []
+        for _rows in range(self.tabs.rowCount()) :
+            for _columns in range (self.DBColumnCount) :
+                _singleitem = self.tabs.item(_rows, _columns)
+                _rowContent.append(_singleitem.text())
+            self.lecturesDataUpdated.append(_rowContent)

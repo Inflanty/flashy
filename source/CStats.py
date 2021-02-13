@@ -78,6 +78,9 @@ class Statistics:
     def getAllRecords(self) :
         return self.database.show('ALL')
 
+    def updateLecture(self, lectureID, data) :
+        self.database.updateSection(lectureID, data)
+
 
 
 if __name__ == "__main__":

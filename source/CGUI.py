@@ -18,6 +18,7 @@ from CDatabaseEdit import DatabaseEdit
 class GUI :
     database = "NULL"
     testme = []
+    tabs = []
 
     def __init__(self):
         self.MainWindowApp = QtWidgets.QApplication(sys.argv)
@@ -44,6 +45,7 @@ class GUI :
         self.ui.actiondatabase.triggered.connect(lambda: self.fileNameOpen())
         self.ui.menuImport.triggered.connect(lambda: self.importData())
         self.ui.actionNew.triggered.connect(lambda: self.newLecture())
+        self.ui.actionSave.triggered.connect(lambda: self.saveLecture())
 
     def fileNameOpen(self) :
         if self.database == "NULL" :   
@@ -99,11 +101,16 @@ class GUI :
         horHeaders = ["ID", "LectureID", "Word", "Sentence", "Transation", "Category"]
         self.tabs.setHorizontalHeaderLabels(horHeaders)
         for _rows in range(self.database.countRecordsByLecture(lectureID)) :
-            # TODO: Implement getRecordFromLecture()
             _rowsContent = self.database.getRecordFromLecture(lectureID, _rows)
             for _columns in range(len(_rowsContent[0]) - 1) :
                 newitem = QTableWidgetItem(str(_rowsContent[0][_columns]))
                 self.tabs.setItem(_rows, _columns, newitem)
+
+    def saveLecture(self) :
+        if self.database != "NULL" :
+            self.data.updateDataFromLecture()
+            self.database.updateLecture(self.data.lectureID, self.data.lecturesDataUpdated)
+
 
     def newLecture(self) :
         print("New File..!")

@@ -14,16 +14,11 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QWidget" name="graphicWidget" native="true">
-    <property name="geometry">
-     <rect>
-      <x>79</x>
-      <y>49</y>
-      <width>731</width>
-      <height>451</height>
-     </rect>
-    </property>
-   </widget>
+   <layout class="QFormLayout" name="formLayout">
+    <item row="0" column="0">
+     <widget class="QWidget" name="graphicWidget" native="true"/>
+    </item>
+   </layout>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -67,6 +62,7 @@
     </widget>
     <addaction name="actionNew"/>
     <addaction name="menuOpen"/>
+    <addaction name="actionSave"/>
     <addaction name="menuEdit"/>
     <addaction name="menuImport"/>
     <addaction name="separator"/>
@@ -134,6 +130,14 @@
   <action name="action">
    <property name="text">
     <string/>
+   </property>
+  </action>
+  <action name="actionSave">
+   <property name="text">
+    <string>Save</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
    </property>
   </action>
  </widget>
