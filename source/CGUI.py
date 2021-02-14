@@ -80,37 +80,16 @@ class GUI :
         if self.database != "NULL" :
             sender = self.MainWindow.sender()
             lectureID = sender.objectName()
-            
             if(self.ui.graphicWidget.isActiveWindow()) :
                 self.plotDatabaseClose()
             self.data = DatabaseEdit(self.database, lectureID)
             self.MainWindow.setCentralWidget(self.data.tabs)
             self.data.databaseOpen()
 
-    def setData(self):
-        horHeaders = []
-        for n, key in enumerate(sorted(self.data.keys())):
-            horHeaders.append(key)
-            for m, item in enumerate(self.data[key]):
-                newitem = QTableWidgetItem(item)
-                self.tabs.setItem(m, n, newitem)
-        self.tabs.setHorizontalHeaderLabels(horHeaders)
-
-    def setDataFromLecture(self, lectureID) :
-        # TODO: Remove this uglyness
-        horHeaders = ["ID", "LectureID", "Word", "Sentence", "Transation", "Category"]
-        self.tabs.setHorizontalHeaderLabels(horHeaders)
-        for _rows in range(self.database.countRecordsByLecture(lectureID)) :
-            _rowsContent = self.database.getRecordFromLecture(lectureID, _rows)
-            for _columns in range(len(_rowsContent[0]) - 1) :
-                newitem = QTableWidgetItem(str(_rowsContent[0][_columns]))
-                self.tabs.setItem(_rows, _columns, newitem)
-
     def saveLecture(self) :
         if self.database != "NULL" :
             self.data.updateDataFromLecture()
             self.database.updateLecture(self.data.lectureID, self.data.lecturesDataUpdated)
-
 
     def newLecture(self) :
         print("New File..!")
@@ -121,7 +100,6 @@ class GUI :
         self.ui.graphicWidget.setTitle("Test Plot", color="w", size="8pt")
         self.ui.graphicWidget.setLabel('left', 'Origins', units='')
         self.ui.graphicWidget.setLabel('bottom', 'Weeks', units='')
-        # plot data: x, y values
         self.ui.graphicWidget.plot(self.database.getRange(), self.database.showProgress())
 
     def plotDatabaseUpdate(self) :
