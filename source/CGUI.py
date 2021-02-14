@@ -167,7 +167,8 @@ if __name__ == "__main__":
     # TEST
     Application = GUI()
 
-#
+#https://stackoverflow.com/questions/48256772/dark-theme-for-qt-widgets
+
 #from PyQt5.QtWidgets import QApplication
 #from PyQt5.QtGui import QPalette, QColor
 #
