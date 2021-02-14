@@ -215,10 +215,8 @@ class Word:
         CSVReader.run()
 
     ## Edit section in database
-    #  NOTE: Update only by lectureID for now
-    #  @param lectureID
     #  @param data - entire and edited lectures data
-    def updateSection(self, lectureID, data) :
+    def updateSection(self, data) :
         for _row in data :
             self.updateRow(_row)
 
@@ -243,7 +241,7 @@ class Word:
     #  @param row to print
     def show(self, row) :
         elements = ""
-        if (row != "ALL") :
+        if (str(row) != "ALL") :
             elements = " WHERE originID = " + str(row)
         self.cursorDB.execute("SELECT * FROM " + self.tableName + elements)
         return self.cursorDB.fetchall()

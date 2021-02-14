@@ -75,11 +75,11 @@ class Statistics:
         lectureIDs = self.database.getLectureIDs(lectureID)
         return self.database.show(lectureIDs[0][0] + row)
 
-    def getAllRecords(self) :
+    def getRecords(self) :
         return self.database.show('ALL')
 
-    def updateLecture(self, lectureID, data) :
-        self.database.updateSection(lectureID, data)
+    def updateLecture(self, data) :
+        self.database.updateSection(data)
 
 
 

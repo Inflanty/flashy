@@ -45,7 +45,7 @@ class GUI :
         self.ui.actiondatabase.triggered.connect(lambda: self.fileNameOpen())
         self.ui.menuImport.triggered.connect(lambda: self.importData())
         self.ui.actionNew.triggered.connect(lambda: self.newLecture())
-        self.ui.actionSave.triggered.connect(lambda: self.saveLecture())
+        self.ui.actionSave.triggered.connect(lambda: self.saveDatabase())
 
     def fileNameOpen(self) :
         if self.database == "NULL" :   
@@ -64,17 +64,23 @@ class GUI :
         self.ui.name.append(self.ui.action)
         self.ui.name[0] = self.ui.action
         if len(lectureList) > 2 :
+            # Edit ALL
+            self.ui.name[0].setObjectName("ALL")
+            self.ui.menuEdit.addAction(self.ui.name[0])
+            self.ui.name[0].setText(QtCore.QCoreApplication.translate("MainWindow", "ALL"))
+            self.ui.name[0].triggered.connect(self.dbEdit)
+            # Lectures edit
             for i in range(1, len(lectureList) + 1) :
-                if i != 1 :
-                    self.ui.name.append(QtWidgets.QAction(self.MainWindow))
-                self.ui.name[i - 1].setObjectName("Lecture " + str(i))
-                self.ui.menuEdit.addAction(self.ui.name[i - 2])
-                self.ui.name[i - 1].setText(QtCore.QCoreApplication.translate("MainWindow", "Lecture " + str(i)))
-                self.ui.name[i - 1].triggered.connect(self.lectureEdit)
+                self.ui.name.append(QtWidgets.QAction(self.MainWindow))
+                self.ui.name[i].setObjectName("Lecture " + str(i))
+                self.ui.menuEdit.addAction(self.ui.name[i - 1])
+                self.ui.name[i].setText(QtCore.QCoreApplication.translate("MainWindow", "Lecture " + str(i)))
+                self.ui.name[i].triggered.connect(self.lectureEdit)
 
     # TODO: entire db edit
     def dbEdit(self) :
-        pass
+        if self.database != "NULL" :
+            print("To be implemented")
 
     def lectureEdit(self) :
         if self.database != "NULL" :
@@ -86,10 +92,15 @@ class GUI :
             self.MainWindow.setCentralWidget(self.data.tabs)
             self.data.databaseOpen()
 
-    def saveLecture(self) :
+    def saveDatabase(self) :
         if self.database != "NULL" :
             self.data.updateDataFromLecture()
-            self.database.updateLecture(self.data.lectureID, self.data.lecturesDataUpdated)
+            self.database.updateLecture(self.data.lecturesDataUpdated)
+
+    # TODO: TEST IT!
+    def saveChanges(self) :
+        if self.database != "NULL" :
+            self.database.updateLecture(self.data.getChangedRows())
 
     def newLecture(self) :
         print("New File..!")

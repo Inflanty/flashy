@@ -10,6 +10,7 @@ class DatabaseEdit :
         self.tabs = QTableWidget(self.DBRowCount, self.DBColumnCount)
         self.tabs.updatesEnabled()
         self.lecturesDataUpdated = []
+        self.rowDataUpdated = []
 
     def __del__(self):
         pass
@@ -58,6 +59,7 @@ class DatabaseEdit :
             for _columns in range(len(_rowsContent[0]) - 1) :
                 newitem = QTableWidgetItem(str(_rowsContent[0][_columns]))
                 self.tabs.setItem(_rows, _columns, newitem)
+                QtCore.QObject.connect(newitem, QtCore.SIGNAL(itemChanged), self.storeUpdated())
 
     def updateDataFromLecture(self) :
         _rowContent = []
@@ -66,3 +68,20 @@ class DatabaseEdit :
                 _singleitem = self.tabs.item(_rows, _columns)
                 _rowContent.append(_singleitem.text())
             self.lecturesDataUpdated.append(_rowContent)
+
+    # TODO : Test this!!!
+    def getChangedRows(self) :
+        _rowContent = []
+        for _row in self.rowDataUpdated :
+            for _columns in range (self.DBColumnCount) :
+                _singleitem = self.tabs.item(_row, _columns)
+                _rowContent.append(_singleitem.text())
+            self.lecturesDataUpdated.append(_rowContent)
+        return self.lecturesDataUpdated
+
+    def storeUpdated(self) :
+        sender = self.MainWindow.sender()
+        item = sender.objectName()
+        _row = item.row()
+        if not (_row in self.lecturesDataUpdated) and (_row != -1) :
+            self.rowDataUpdated.append(_row)
