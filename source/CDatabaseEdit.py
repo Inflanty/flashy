@@ -34,7 +34,6 @@ class DatabaseEdit :
     def lectureEdit(self) :
             if hasattr(self, 'tabs') :
                 self.tabs.close()
-            #self.setData()
             self.setDataFromLecture(self.lectureID)
             self.tabs.resizeColumnsToContents()
             self.tabs.resizeRowsToContents()
@@ -55,7 +54,6 @@ class DatabaseEdit :
         horHeaders = ["ID", "LectureID", "Word", "Sentence", "Transation", "Category"]
         self.tabs.setHorizontalHeaderLabels(horHeaders)
         for _rows in range(self.database.countRecordsByLecture(self.lectureID)) :
-            # TODO: Implement getRecordFromLecture()
             _rowsContent = self.database.getRecordFromLecture(self.lectureID, _rows)
             for _columns in range(len(_rowsContent[0]) - 1) :
                 newitem = QTableWidgetItem(str(_rowsContent[0][_columns]))
