@@ -79,8 +79,13 @@ class GUI :
 
     # TODO: entire db edit
     def dbEdit(self) :
-        if self.database != "NULL" :
-            print("To be implemented")
+        print("TODO: REFACTOR DatabaseEdit")
+        # if self.database != "NULL" :
+        #     if(self.ui.graphicWidget.isActiveWindow()) :
+        #         self.plotDatabaseClose()
+        #     self.data = DatabaseEdit(self.database)
+        #     self.MainWindow.setCentralWidget(self.data.tabs)
+        #     self.data.databaseOpen()
 
     def lectureEdit(self) :
         if self.database != "NULL" :

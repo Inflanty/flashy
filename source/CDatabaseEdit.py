@@ -1,16 +1,29 @@
 from PyQt5.QtWidgets import QTableWidget, QTableWidgetItem
 import re
 
+# REFACTOR THIS UGLT CLASS UNTIL IS NOT TOO LATE !!!
+# THE CONCEPT OF EDITING SINGLE LECTURE SHOULD BE REDESIGN.
+# THE MAIN TRACK HERE SHOULD BE TO EDIT ENTIRE DATABASE, WITH OPTION TO EDIT SINGLE LECTURE.
+#
+# AS IS VISIBLE RIGHT NOW, THE FUNCTIONS WILL BE MULTIPLICATED.
+#
+# ALSO, SOME FIELDS SHOULDNT BE EDITABLE (id & ???)
+#
+
 class DatabaseEdit :
-    def __init__(self, database, lectureID) :
+    def __init__(self, database, lectureID = 0) :
         self.database = database
-        self.lectureID = re.findall(r'\d+', lectureID)[0]
+        self.rowDataUpdated = []
+        self.lecturesDataUpdated = []
         self.DBColumnCount = 6
-        self.DBRowCount = self.database.countRecordsByLecture(self.lectureID)
+        if lectureID == 0 :
+            # entire database edit
+            self.DBRowCount = self.database.getRecords()
+        else :
+            self.lectureID = re.findall(r'\d+', lectureID)[0]
+            self.DBRowCount = self.database.countRecordsByLecture(self.lectureID)
         self.tabs = QTableWidget(self.DBRowCount, self.DBColumnCount)
         self.tabs.updatesEnabled()
-        self.lecturesDataUpdated = []
-        self.rowDataUpdated = []
 
     def __del__(self):
         pass
@@ -33,22 +46,34 @@ class DatabaseEdit :
                 self.tabs.setItem(_rows, _columns, newitem)
 
     def lectureEdit(self) :
-            if hasattr(self, 'tabs') :
-                self.tabs.close()
-            self.setDataFromLecture(self.lectureID)
-            self.tabs.resizeColumnsToContents()
-            self.tabs.resizeRowsToContents()
-            self.MainWindow.setCentralWidget(self.tabs)
-            self.tabs.show()
+        if hasattr(self, 'tabs') :
+            self.tabs.close()
+        self.setDataFromLecture(self.lectureID)
+        self.tabs.resizeColumnsToContents()
+        self.tabs.resizeRowsToContents()
+        self.MainWindow.setCentralWidget(self.tabs)
+        self.tabs.show()
 
-    def setData(self):
-        horHeaders = []
-        for n, key in enumerate(sorted(self.data.keys())):
-            horHeaders.append(key)
-            for m, item in enumerate(self.data[key]):
-                newitem = QTableWidgetItem(item)
-                self.tabs.setItem(m, n, newitem)
+    def databaseEdit(self) :
+        if hasattr(self, 'tabs') :
+            self.tabs.close()
+        self.setDataFromLecture(self.lectureID)
+        self.tabs.resizeColumnsToContents()
+        self.tabs.resizeRowsToContents()
+        self.MainWindow.setCentralWidget(self.tabs)
+        self.tabs.show()
+
+    def setDataFromDatabase(self) :
+        # TODO: Remove this uglyness
+        lectureIDs = self.database.getAllIDs()
+        horHeaders = ["ID", "LectureID", "Word", "Sentence", "Transation", "Category"]
         self.tabs.setHorizontalHeaderLabels(horHeaders)
+        for _rows in range(self.DBRowCount) :
+            _rowsContent = self.database.getRecord(self.lectureID, _rows)
+            for _columns in range(len(_rowsContent[0]) - 1) :
+                newitem = QTableWidgetItem(str(_rowsContent[0][_columns]))
+                self.tabs.setItem(_rows, _columns, newitem)
+                QtCore.QObject.connect(newitem, QtCore.SIGNAL(itemChanged), self.storeUpdated())
 
     def setDataFromLecture(self) :
         # TODO: Remove this uglyness

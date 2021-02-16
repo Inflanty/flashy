@@ -151,6 +151,16 @@ class Word:
             IDs = 'N/A'
         return IDs
 
+    ## Get IDs of database
+    #  @return IDs list
+    def getAllIDs(self) :
+        try:
+            self.cursorDB.execute("SELECT originID FROM " + self.tableName)
+            IDs = self.cursorDB.fetchall()
+        except IndexError:
+            IDs = 'N/A'
+        return IDs
+
     ## Add single row to database
     #  @param row to add
     #         row format :
