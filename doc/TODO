@@ -1,4 +1,4 @@
-<mxfile host="app.diagrams.net" modified="2021-02-28T09:51:16.256Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.190 Safari/537.36" etag="FTYeTIA5xpvhkXF61cFw" version="14.4.3" type="github">
+<mxfile host="app.diagrams.net" modified="2021-02-28T10:05:01.603Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.190 Safari/537.36" etag="3ZHQ63b5-D0tm11YvKMZ" version="14.4.3" type="github">
   <diagram id="wFE0QG_FPsp0jaGvCLVb" name="Page-1">
     <mxGraphModel dx="1422" dy="800" grid="1" gridSize="10" guides="0" tooltips="1" connect="0" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" background="none" math="0" shadow="1">
       <root>
@@ -30,6 +30,11 @@
         <object label="SW UML Diagram" placeholders="1" id="cLmTwog-ezC90-xQI3y9-4">
           <mxCell style="whiteSpace=wrap;html=1;strokeWidth=2;fillColor=swimlane;fontStyle=1;spacingTop=0;rounded=1;arcSize=9;points=[];sketch=0;fontFamily=Courier New;hachureGap=8;fillWeight=1;strokeColor=none;" vertex="1" parent="cLmTwog-ezC90-xQI3y9-1">
             <mxGeometry x="20" y="121" width="140" height="80" as="geometry" />
+          </mxCell>
+        </object>
+        <object label="Obsolete SW release" placeholders="1" id="cLmTwog-ezC90-xQI3y9-24">
+          <mxCell style="whiteSpace=wrap;html=1;strokeWidth=2;fillColor=swimlane;fontStyle=1;spacingTop=0;rounded=1;arcSize=9;points=[];sketch=0;fontFamily=Courier New;hachureGap=8;fillWeight=1;strokeColor=none;" vertex="1" parent="cLmTwog-ezC90-xQI3y9-1">
+            <mxGeometry x="20" y="221" width="140" height="80" as="geometry" />
           </mxCell>
         </object>
         <object label="DOING" status="In progress" id="_5mSTuPxr-ZiKRkBDSY7-6">
