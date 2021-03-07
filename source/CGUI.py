@@ -10,8 +10,10 @@ from CMainWindow import Ui_MainWindow
 from CFileBrowser import Ui_FileBrowser
 from CStats import Statistics
 from CSVReader import MyWindow
-from CDatabaseEdit import DatabaseEdit
+from CDbEdit import DatabaseEdit
+import logging
 
+logging.debug('Debug logger')
 
 # For MainWindow geneate :  pyuic5 -x  .\mainwindow.ui -o ..\..\source\CMainWindow.py
 
@@ -32,7 +34,7 @@ class GUI :
         sys.exit(self.MainWindowApp.exec_())
 
     def __del__(self):
-        print("Bye")
+        logging.info("Bye")
         if self.database != "NULL" :
             self.database.closeConnection()
             self.database = "NULL"
@@ -45,7 +47,7 @@ class GUI :
         self.ui.actiondatabase.triggered.connect(lambda: self.fileNameOpen())
         self.ui.menuImport.triggered.connect(lambda: self.importData())
         self.ui.actionNew.triggered.connect(lambda: self.newLecture())
-        self.ui.actionSave.triggered.connect(lambda: self.saveDatabase())
+        self.ui.actionSave.triggered.connect(lambda: self.saveChanges())
 
     def fileNameOpen(self) :
         if self.database == "NULL" :   
@@ -56,7 +58,7 @@ class GUI :
             self.plotDatabase()
             self.createActionOnEdit(self.database.getRange())
         else :
-            print("Database exist!")
+            logging.info("Database exist!")
 
     def createActionOnEdit(self, lectureList) :
         # First edit existing action
@@ -75,40 +77,26 @@ class GUI :
                 self.ui.name[i].setObjectName("Lecture " + str(i))
                 self.ui.menuEdit.addAction(self.ui.name[i - 1])
                 self.ui.name[i].setText(QtCore.QCoreApplication.translate("MainWindow", "Lecture " + str(i)))
-                self.ui.name[i].triggered.connect(self.lectureEdit)
+                self.ui.name[i].triggered.connect(self.dbEdit)
 
-    # TODO: entire db edit
     def dbEdit(self) :
-        print("TODO: REFACTOR DatabaseEdit")
-        # if self.database != "NULL" :
-        #     if(self.ui.graphicWidget.isActiveWindow()) :
-        #         self.plotDatabaseClose()
-        #     self.data = DatabaseEdit(self.database)
-        #     self.MainWindow.setCentralWidget(self.data.tabs)
-        #     self.data.databaseOpen()
-
-    def lectureEdit(self) :
         if self.database != "NULL" :
             sender = self.MainWindow.sender()
             lectureID = sender.objectName()
-            if(self.ui.graphicWidget.isActiveWindow()) :
+            if (self.ui.graphicWidget.isActiveWindow()) :
                 self.plotDatabaseClose()
+            if (lectureID == "ALL") :
+                lectureID = 0
             self.data = DatabaseEdit(self.database, lectureID)
             self.MainWindow.setCentralWidget(self.data.tabs)
-            self.data.databaseOpen()
+            self.data.dataPresent()
 
-    def saveDatabase(self) :
-        if self.database != "NULL" :
-            self.data.updateDataFromLecture()
-            self.database.updateLecture(self.data.lecturesDataUpdated)
-
-    # TODO: TEST IT!
     def saveChanges(self) :
         if self.database != "NULL" :
-            self.database.updateLecture(self.data.getChangedRows())
+            self.database.updateRecords(self.data.getEdited())
 
     def newLecture(self) :
-        print("New File..!")
+        logging.info("New File..!")
 
     def plotDatabase(self) :
         self.ui.graphicWidget = pg.PlotWidget()
@@ -135,7 +123,7 @@ class GUI :
 
     def importData(self) :
         if self.database == "NULL" : 
-            print("Open database first!")
+            logging.warning("Open database first!")
         else :
             currentPath = pathlib.Path().absolute()
             self.fileName = QtWidgets.QFileDialog()
@@ -145,7 +133,7 @@ class GUI :
 
     def popupEdit(self) :
         if self.database == "NULL" : 
-            print("Open database first!")
+            logging.warning("Open database first!")
         else :
             self.listwidget = QListWidget()
             for i in range(1, len(self.database.getRange())) :
@@ -155,7 +143,6 @@ class GUI :
 
     def clicked(self) :
         item = self.listwidget.currentItem()
-        print(item.text())
         self.listwidget.close()
 
     def deleteData(self, lecture) :
@@ -164,12 +151,13 @@ class GUI :
         self.plotDatabaseUpdate()
 
     def exit(self) :
-        print("Exit")
+        logging.info("Exit")
         #self.MainWindowApp.aboutToQuit.connect(self.MainWindow.closeEvent())
         self.MainWindowApp.quit()
 
 if __name__ == "__main__":
     # TEST
+    logging.basicConfig(level=logging.NOTSET)
     Application = GUI()
 
 #https://stackoverflow.com/questions/48256772/dark-theme-for-qt-widgets

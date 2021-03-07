@@ -12,6 +12,7 @@ import sqlite3
 import csv
 import time
 import CSVReader
+import logging
 
 ## Documentation for a class.
 #
@@ -30,7 +31,7 @@ class Word:
             self.cursorDB = self.connDB.cursor()
             self.initDB()
         else :
-            print(name + " is not .db file")
+            logging.warning(name + " is not .db file")
             exit
     
     ## Word destructor
@@ -38,8 +39,8 @@ class Word:
         self.closeConnection()
 
     ## Database init
-    #  @brief This methow create database if not exist,
-    #         else, just pass
+    #  @brief This method creates database if not exist,
+    #         else, just pass.
     def initDB(self) :
         try :
             self.cursorDB.execute("""CREATE TABLE """ + self.tableName + """ (
@@ -53,9 +54,9 @@ class Word:
                 )""")
             self.connDB.commit()
         except sqlite3.OperationalError:
-            print("Table words exist!")
+            logging.info("Table words exist!")
         except sqlite3.DatabaseError:
-            print("File is not a database")
+            logging.warning("File is not a database")
 
     ## Get column names from database
     #  @return list with columns name
@@ -185,9 +186,9 @@ class Word:
                         'trans'  : row[3],
                         'category'  : row[4],
                         'dikiLink' : link})
-            print('Added record : ' + row[1])
+            logging.info('Added record : ' + row[1])
         else :
-            print('Error! Row format : [lectureID, origin, sentence, trans, category]')
+            logging.error('Row format : [lectureID, origin, sentence, trans, category]')
 
     ## Delete record from database
     #  @param ID of record to delete
@@ -197,9 +198,9 @@ class Word:
                 try :
                     self.cursorDB.execute("DELETE FROM " + self.tableName + " WHERE originID = " + str(ID))
                 except sqlite3.OperationalError :
-                    print('Element not exist!')
+                    logging.warning('Element not exist!')
         else :
-            print('Error! Row format : [lectureID, origin, sentence, trans, category]')
+            logging.error('Error! Row format : [lectureID, origin, sentence, trans, category]')
 
     ## Import CSV file to database
     #  @param filename
@@ -213,9 +214,9 @@ class Word:
                 if ID == 0 :
                     self.addRecord(row)
                 else :
-                    print(row[1] + " exist on position " + str(ID))
+                    logging.warning(row[1] + " exist on position " + str(ID))
         toc = time.perf_counter()
-        print(f"Imported CSV file in {toc - tic:0.4f} seconds")
+        logging.info(f"Imported CSV file in {toc - tic:0.4f} seconds")
 
     ## Export row to CSV file
     #  @param lectureID
@@ -245,14 +246,20 @@ class Word:
                                       """ WHERE originID = :originID""",
                                       {'originID': row[0], 'lectureID': row[1], 'origin':row[2], 'sentence': row[3], 'trans':row[4], 'category': row[5]})
             except IndexError:
-                print("IndexError")
+                logging.error("IndexError")
 
     ## Swow single row
     #  @param row to print
-    def show(self, row) :
+    def getRow(self, row) :
+        self.cursorDB.execute("SELECT * FROM " + self.tableName + " WHERE originID = " + str(row))
+        return self.cursorDB.fetchall()
+
+    ## Swow single row
+    #  @param row to print
+    def get(self, lectureID = 0) :
         elements = ""
-        if (str(row) != "ALL") :
-            elements = " WHERE originID = " + str(row)
+        if (lectureID != 0) :
+            elements = " WHERE lectureID = " + str(lectureID)
         self.cursorDB.execute("SELECT * FROM " + self.tableName + elements)
         return self.cursorDB.fetchall()
 
@@ -261,12 +268,12 @@ class Word:
         self.cursorDB.execute("SELECT * FROM " + self.tableName)
         table = self.cursorDB.fetchall()
         for i in table :
-            print(i)
+            logging.info(i)
 
     ## Close connection to database
     def closeConnection(self) :
         try :
             self.connDB.close()
-            print('Connection to ' + self.name + ' closed!')
+            logging.info('Connection to ' + self.name + ' closed!')
         except AttributeError:
             pass

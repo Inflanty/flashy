@@ -2,6 +2,7 @@ import os.path
 import matplotlib.pyplot as plt
 import numpy as np
 from CWord import Word
+import logging
 
 class Statistics:
     def __init__(self, databaseName):
@@ -16,7 +17,7 @@ class Statistics:
             self.database.importCSV(fileName)
             self.database.present()
         else :
-            print("File " + str(fileName) + " does not exist!")
+            logging.warning("File " + str(fileName) + " does not exist!")
 
     def getRange(self):
         weeks = list(range(0, (self.database.getLectureID() + 1)))
@@ -42,7 +43,7 @@ class Statistics:
     def deleteLecturesRecords(self, lectureID) :
         lecturesIDs = self.database.getLectureIDs(lectureID)
         for row in lecturesIDs :
-            print(row[0])
+            logging.info(row[0])
             self.database.deleteRecord(row[0])
 
     def showProgressGraph(self):
@@ -73,7 +74,7 @@ class Statistics:
 
     def getRecordFromLecture(self, lectureID, row) :
         lectureIDs = self.database.getLectureIDs(lectureID)
-        return self.database.show(lectureIDs[0][0] + row)
+        return self.database.getRow(lectureIDs[0][0] + row)
 
     def getRecord(self, row) :
         return self.database.show(row)
@@ -81,7 +82,7 @@ class Statistics:
     def getRecords(self) :
         return self.database.show('ALL')
 
-    def updateLecture(self, data) :
+    def updateRecords(self, data) :
         self.database.updateSection(data)
 
 
@@ -91,4 +92,4 @@ if __name__ == "__main__":
     # Take a data from DB
     database = Statistics("words.db")
     data = database.showProgress()
-    print(data)
+    logging.info(data)
