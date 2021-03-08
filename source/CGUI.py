@@ -13,8 +13,6 @@ from CSVReader import MyWindow
 from CDbEdit import DatabaseEdit
 import logging
 
-logging.debug('Debug logger')
-
 # For MainWindow geneate :  pyuic5 -x  .\mainwindow.ui -o ..\..\source\CMainWindow.py
 
 class GUI :
@@ -89,6 +87,7 @@ class GUI :
                 lectureID = 0
             self.data = DatabaseEdit(self.database, lectureID)
             self.MainWindow.setCentralWidget(self.data.tabs)
+            # self.data.dataPresent()
             self.data.dataPresent()
 
     def saveChanges(self) :

@@ -1,5 +1,7 @@
+from PyQt5 import QtCore
 from PyQt5.QtWidgets import QTableWidget, QTableWidgetItem
 import re
+import logging
 
 ## Documentation for DatabaseEdit class
 #
@@ -13,6 +15,7 @@ class DatabaseEdit :
         self.DBColumnCount = 6
         if lectureID == 0 :
             # entire database edit
+            self.lectureID = lectureID
             self.DBRowCount = self.database.getRecords()
         else :
             self.lectureID = re.findall(r'\d+', lectureID)[0]
@@ -21,10 +24,11 @@ class DatabaseEdit :
         # We do not want to have origin ID and link from db
         self.tabs = QTableWidget(self.DBRowCount, self.DBColumnCount)
         self.tabs.updatesEnabled()
-        self.lectureID = lectureID
+        #self.trigger = QtCore.pyqtSignal()
+        #self.trigger.connect(itemUpdateClbk)
 
     ## DatabaseEdit destructor
-    def __del__(slef) :
+    def __del__(self) :
         self.lectureID = 0
 
     ## Data is pull from db and push to tabs
@@ -41,9 +45,11 @@ class DatabaseEdit :
         # Every item has own data, pulled from database
         for _rows in range(self.DBRowCount) :
             # TODO: restrict item ID from editing
-            for _columns in range(len(_rowsContent[0]) - 1) :
-                newitem = QTableWidgetItem(str(_rowsContent[0][_columns]))
+            for _columns in range(6) :
+                # logging.warning(_rowsContent[_rows][_columns][0])
+                newitem = QTableWidgetItem(str(_rowsContent[_rows][_columns][0]))
                 self.tabs.setItem(_rows, _columns, newitem)
+                # TODO: ItemChanged signal define or ????
                 QtCore.QObject.connect(newitem, QtCore.SIGNAL(itemChanged), self.itemUpdateClbk())
         # The structure needs to be adjusted
         # TODO: Fix this

@@ -150,6 +150,8 @@ class Word:
             IDs = self.cursorDB.fetchall()
         except IndexError:
             IDs = 'N/A'
+        except sqlite3.OperationalError:
+            IDs = 'N/A'
         return IDs
 
     ## Get IDs of database
