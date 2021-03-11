@@ -232,6 +232,7 @@ class Word:
     def updateSection(self, data) :
         for _row in data :
             self.updateRow(_row)
+            logging.info("Updated row : " + str(_row))
 
     ## Edit row in database
     #  @param row - row data (list)
