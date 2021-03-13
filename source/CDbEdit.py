@@ -34,8 +34,8 @@ class DatabaseEdit :
     def dataPresent(self) :
         horHeaders = self.database.showHeader()
         self.tabs.setHorizontalHeaderLabels(horHeaders)
-        # The data can be edited in lecture mode
-        #  OR as a whole blob of data
+        # The data can be edited as a blob of data
+        #  OR in lecture mode
         if (self.lectureID == 0) :
             _rowsContent = self.database.getRecordsFromDatabase()
         else :

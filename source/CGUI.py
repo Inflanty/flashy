@@ -11,6 +11,7 @@ from CFileBrowser import Ui_FileBrowser
 from CStats import Statistics
 from CSVReader import MyWindow
 from CDbEdit import DatabaseEdit
+from CDbNew import NewSection
 import logging
 
 # For MainWindow geneate :  pyuic5 -x  .\mainwindow.ui -o ..\..\source\CMainWindow.py
@@ -87,7 +88,6 @@ class GUI :
                 lectureID = 0
             self.data = DatabaseEdit(self.database, lectureID)
             self.MainWindow.setCentralWidget(self.data.tabs)
-            # self.data.dataPresent()
             self.data.dataPresent()
 
     def saveChanges(self) :
@@ -95,7 +95,12 @@ class GUI :
             self.database.updateRecords(self.data.getEdited())
 
     def newLecture(self) :
-        logging.info("New File..!")
+        if self.database != "NULL" :
+            logging.info("New section")
+            self.data = NewSection()
+            self.MainWindow.setCentralWidget(self.data.tabs)
+            self.data.tabs.show()
+
 
     def plotDatabase(self) :
         self.ui.graphicWidget = pg.PlotWidget()
