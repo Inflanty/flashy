@@ -20,7 +20,7 @@ class DatabaseEdit :
         else :
             self.lectureID = re.findall(r'\d+', lectureID)[0]
             self.DBRowCount = self.database.countRecordsByLecture(self.lectureID)
-        self.rowDataUpdated = []
+        self.itemsUpdated = [[]]
         # We do not want to have origin ID and link from db
         self.tabs = QTableWidget(self.DBRowCount, self.DBColumnCount)
         self.tabs.updatesEnabled()
@@ -51,41 +51,51 @@ class DatabaseEdit :
         self.tabs.resizeRowsToContents()
         self.tabs.show()
 
+    ## Get selected row
+    #  @return selected row
     def selectedRow(self):
         if self.tabs.selectionModel().hasSelection():
             row =  self.tabs.selectionModel().selectedIndexes()[0].row()
             return int(row)
 
+    ## Get selected column
+    #  @return selected column
     def selectedColumn(self):
         column =  self.tabs.selectionModel().selectedIndexes()[0].column()
         return int(column)
 
-    ## I data is updated, the system needs to save the row of data
+    ## If data is updated, the system needs to save the row of data
     #  @brief This metod is a callback for item edit event
-    #         the edited datas row will be stored in rowDataUpdated
-    #  TODO: Can't update the same row twice
+    #         the edited datas row will be stored in itemsUpdated
     def itemUpdateClbk(self) :
         # Do not update the ID
         if (self.selectedColumn() == 0) :
             logging.warning("The element will be not saved")
             return
-        item = self.tabs.selectedItems()[0]
         _row = self.selectedRow()
         _rowContent = []
         for _columns in range (self.DBColumnCount) :
-            _singleitem = self.tabs.item(_row, _columns)
-            _singleitemcontent = _singleitem.text()
-            # Break if the element already exist
-            if (_columns == 0) :
-                for _singleRow in range(len(self.rowDataUpdated)) :
-                    if (_singleitemcontent in self.rowDataUpdated[_singleRow]) :
-                        logging.warning("Can not add, " + _singleitemcontent + ". Already exist!")
-                        return
-            _rowContent.append(_singleitemcontent)
-        self.rowDataUpdated.append(_rowContent)
-        logging.warning(self.rowDataUpdated)
+            _singleitem = self.tabs.item(_row, _columns).text()
+            if _columns == 0 :
+                _listItem = self.__getMyListItem(_singleitem)
+            logging.info(str(_listItem) + '_' + str(_columns) + ' = ' + str(_singleitem))
+            self.itemsUpdated[_listItem][_columns] = _singleitem
+        logging.warning(self.itemsUpdated)
+
+    ## Updated row should be saved in itemsUpdated list,
+    #  if particular ID already exist, it has to be updated in the same place
+    #  @param itemID ID of the item to be updated
+    #  @return position on list to be updated with provided itemID
+    def __getMyListItem(self, itemID) :
+        _len = len(self.itemsUpdated)
+        if _len > 0 :
+            for _singleRow in range(_len) :
+                if (itemID in self.itemsUpdated[_singleRow]) :
+                    return _singleRow
+        return _len
 
     ## To allow edited data save, the class should return edited data
     #  @return Edited rows content
     def getEdited(self) :
-        return self.rowDataUpdated
+        return self.itemsUpdated
+

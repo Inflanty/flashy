@@ -26,13 +26,13 @@ class Word:
             self.name = ':memory:'
         elif ".db" in name:
             self.name = name
-            self.tableName = "record"
-            self.connDB = sqlite3.connect(str(self.name))
-            self.cursorDB = self.connDB.cursor()
-            self.initDB()
         else :
             logging.warning(name + " is not .db file")
             exit
+        self.tableName = "record"
+        self.connDB = sqlite3.connect(str(self.name))
+        self.cursorDB = self.connDB.cursor()
+        self.initDB()
     
     ## Word destructor
     def __del__(self) :
@@ -70,6 +70,8 @@ class Word:
 
     ## Get last lecture, could be use for all lectures counting
     #  @return Last kecture ID
+    #  TODO: This will return last lecture ID only when we have an increasing order in the db,
+    #        We don't want to limit ourselfes to keep the order
     def getLectureID(self) :
         try:
             self.cursorDB.execute("SELECT lectureID FROM " + self.tableName + " ORDER BY lectureID DESC LIMIT 1")
@@ -173,7 +175,7 @@ class Word:
     #         [3] Traslation of origin
     #         [4] Origin category
     def addRecord(self, row) :
-        if (len(row) == 5) and not ("#" in row[0]):
+        if self.__checkRecord(row):
             newID = self.getLastID() + 1
             if row[4] != "IT" :
                 link = "https://www.diki.pl/slownik-angielskiego?q=" + str(row[1].lower()).replace(" ", "+")
@@ -189,8 +191,6 @@ class Word:
                         'category'  : row[4],
                         'dikiLink' : link})
             logging.info('Added record : ' + row[1])
-        else :
-            logging.error('Row format : [lectureID, origin, sentence, trans, category]')
 
     ## Delete record from database
     #  @param ID of record to delete
@@ -238,18 +238,19 @@ class Word:
     #  @param row - row data (list)
     #  The row has to be in right format here
     def updateRow(self, row) :
-        with self.connDB:
-            try:
-                self.cursorDB.execute("""UPDATE """ + self.tableName + 
-                                      """ SET  trans = :trans, """ + 
-                                      """origin = :origin, """ +
-                                      """category = :category, """ +
-                                      """sentence = :sentence, """ +
-                                      """lectureID = :lectureID """ +
-                                      """ WHERE originID = :originID""",
-                                      {'originID': row[0], 'lectureID': row[1], 'origin':row[2], 'sentence': row[3], 'trans':row[4], 'category': row[5]})
-            except IndexError:
-                logging.error("IndexError")
+        if self.__checkRecord(row):
+            with self.connDB:
+                try:
+                    self.cursorDB.execute("""UPDATE """ + self.tableName + 
+                                          """ SET  trans = :trans, """ + 
+                                          """origin = :origin, """ +
+                                          """category = :category, """ +
+                                          """sentence = :sentence, """ +
+                                          """lectureID = :lectureID """ +
+                                          """ WHERE originID = :originID""",
+                                          {'originID': row[0], 'lectureID': row[1], 'origin':row[2], 'sentence': row[3], 'trans':row[4], 'category': row[5]})
+                except IndexError:
+                    logging.error("IndexError")
 
     ## Swow single row
     #  @param row to print
@@ -280,3 +281,17 @@ class Word:
             logging.info('Connection to ' + self.name + ' closed!')
         except AttributeError:
             pass
+
+    ## The recors has to be check formatwise,
+    #  before we can add it to the database
+    #  @param row to check
+    def __checkRecord(self, row) :
+        if (len(row) == 5) and not ("#" in row[0]):
+            if  row[0].isdigit() and not any(map(str.isdigit, row[1])) and not any(map(str.isdigit, row[3])) and not any(map(str.isdigit, row[4])) :
+                return True
+        logging.error("Wrong row format :\nLecture ID : " + row[0] + 
+                      "\nOrigin : " + row[1] + 
+                      "\nSentence : " + row[2] + 
+                      "\nTranslation : " + row[3] + 
+                      "\nCategory : " + row[4])
+        return False

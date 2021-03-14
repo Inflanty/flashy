@@ -28,7 +28,6 @@ class GUI :
         self.ui.setupUi(self.MainWindow)
         self.onTriggerHook()
         self.MainWindowApp.lastWindowClosed.connect(self.exit)
-        #pyqtgraph.examples.run()
         self.MainWindow.show()
         sys.exit(self.MainWindowApp.exec_())
 
@@ -82,25 +81,25 @@ class GUI :
         if self.database != "NULL" :
             sender = self.MainWindow.sender()
             lectureID = sender.objectName()
-            if (self.ui.graphicWidget.isActiveWindow()) :
+            if self.ui.graphicWidget.isActiveWindow() :
                 self.plotDatabaseClose()
-            if (lectureID == "ALL") :
+            if lectureID == "ALL" :
                 lectureID = 0
-            self.data = DatabaseEdit(self.database, lectureID)
-            self.MainWindow.setCentralWidget(self.data.tabs)
-            self.data.dataPresent()
+            self.edit = DatabaseEdit(self.database, lectureID)
+            self.MainWindow.setCentralWidget(self.edit.tabs)
+            self.edit.dataPresent()
 
     def saveChanges(self) :
         if self.database != "NULL" :
-            self.database.updateRecords(self.data.getEdited())
+            self.database.updateRecords(self.edit.getEdited())
 
     def newLecture(self) :
         if self.database != "NULL" :
-            logging.info("New section")
-            self.data = NewSection()
-            self.MainWindow.setCentralWidget(self.data.tabs)
-            self.data.tabs.show()
-
+            if self.ui.graphicWidget.isActiveWindow() :
+                self.plotDatabaseClose()
+            self.new = NewSection()
+            self.MainWindow.setCentralWidget(self.new.tabs)
+            self.new.tabs.show()
 
     def plotDatabase(self) :
         self.ui.graphicWidget = pg.PlotWidget()

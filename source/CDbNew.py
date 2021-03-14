@@ -1,8 +1,12 @@
 from PyQt5.QtGui import QKeySequence
 from PyQt5.QtWidgets import QTableWidget, QTableWidgetItem, QShortcut
-import logging
+import logging, re
 
+## Documentation for NewSection class
+#
+#  The class provide all neccessary functionalities for add new section into databse
 class NewSection :
+    ## NewSection Class constructor
     def __init__(self) :
         self.columnCount = 4
         self.maxColumnWidth = 50
@@ -12,14 +16,18 @@ class NewSection :
         self.shortcutsNewRow.activated.connect(self.setNewRow)
         self.shortcutsRmRow = QShortcut(QKeySequence('Ctrl+Del'), self.tabs)
         self.shortcutsRmRow.activated.connect(self.rmSelectedRow)
-        self.setNewSection()
+        self.createNewSection()
 
+    ## NewSection Class destructor
     def __del__(self) :
         self.tabs.clear()
 
-    def setNewSection(self) :
-        horHeaders = ['Section ID', 'Word', 'Translation', 'Sentence']
-        self.tabs.setHorizontalHeaderLabels(horHeaders)
+    ## As a main class functionality, we provide here an option to create new section,
+    #  as a section data, the user can refer to a data from part. Lecture
+    #  TODO: ADD option to write category
+    def createNewSection(self) :
+        _horHeaders = ['Section ID', 'Word', 'Translation', 'Sentence']
+        self.tabs.setHorizontalHeaderLabels(_horHeaders)
         for _columns in range(self.columnCount) :
             newitem = QTableWidgetItem('')
             self.tabs.setItem(0, _columns, newitem)
@@ -27,14 +35,21 @@ class NewSection :
         # Nothing in rows, minimal value
         self.tabs.resizeRowsToContents()
 
-    def getNewSection(self) :
+    def getEdited(self) :
         _rowContent = []
         _rowsContent = []
         for _rows in range(self.tabs.rowCount()) :
+            _rowContent = []
             for _columns in range(self.columnCount) :
                 _singleitem = self.tabs.item(_rows, _columns).text()
                 _rowContent.append(_singleitem)
-            _rowsContent.append(_singleitem)
+            if self.__checkIfEdited(_rowContent) :
+                logging.info('The item has been edited ')
+                print(_rowContent)
+                _rowsContent.append(_rowContent)
+            else :
+                logging.info('The item has NOT been edited')
+                print(_rowContent)
         return _rowsContent
 
     def setNewRow(self) :
@@ -68,3 +83,9 @@ class NewSection :
     def selectedColumn(self):
         column =  self.tabs.selectionModel().selectedIndexes()[0].column()
         return int(column)
+
+    def __checkIfEdited(self, row) :
+        for _item in row :
+            if re.match("^(?![\s\S])", _item) == None :
+                return True
+        return False

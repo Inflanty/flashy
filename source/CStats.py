@@ -20,6 +20,7 @@ class Statistics:
             logging.warning("File " + str(fileName) + " does not exist!")
 
     def getRange(self):
+        print(self.database.getLectureID())
         weeks = list(range(0, (self.database.getLectureID() + 1)))
         return weeks
 
@@ -81,7 +82,6 @@ class Statistics:
         lectureIDs = self.database.getLectureIDs(lectureID)
         for _row in range(self.countRecordsByLecture(lectureID)) :
             _lectureRows.append(self.database.getRow(lectureIDs[0][0] + _row))
-            # logging.debug(self.database.getRow(lectureIDs[0][0] + _row))
         return _lectureRows
 
     def getRecord(self, row) :
@@ -98,6 +98,12 @@ class Statistics:
 if __name__ == "__main__":
     # TEST
     # Take a data from DBgetRecordsFromLecture
-    database = Statistics("words.db")
+    database = Statistics("mem")
+    database.addProgress("../resources/endata/l1TEST.csv")
+    database.addProgress("../resources/endata/l3.csv")
+    database.addProgress("../resources/endata/l14.csv")
     data = database.showProgress()
-    logging.info(data)
+    print(database.getRange())
+    database.addProgress("../resources/endata/l15.csv")
+    print(database.getRange())
+
