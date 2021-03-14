@@ -58,9 +58,10 @@ class GUI :
             currentPath = pathlib.Path().absolute()
             self.fileName = QtWidgets.QFileDialog()
             opentFileName = self.fileName.getOpenFileName(self.fileName, "Open File", str(currentPath), "Database Files (*.db)")
-            self.database = Statistics(str(opentFileName[0]))
-            self.plotDatabase()
-            self.createActionOnEdit(self.database.getRange())
+            if str(opentFileName[0]) != "" :
+                self.database = Statistics(str(opentFileName[0]))
+                self.plotDatabase()
+                self.createActionOnEdit(self.database.getRange())
         else :
             logging.info("Database exist!")
 
