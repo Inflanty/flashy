@@ -2,6 +2,7 @@ import sys
 import pathlib
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMessageBox, QComboBox, QListWidget
+import qdarkstyle
 from pyqtgraph import PlotWidget, plot
 import pyqtgraph as pg
 import pyqtgraph.examples
@@ -23,6 +24,7 @@ class GUI :
 
     def __init__(self):
         self.MainWindowApp = QtWidgets.QApplication(sys.argv)
+        self.__setPalette()
         self.MainWindow = QtWidgets.QMainWindow()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self.MainWindow)
@@ -39,6 +41,10 @@ class GUI :
         else :
             pass
         self.MainWindowApp.quit()
+    
+    def __setPalette(self) :
+        dark_stylesheet = qdarkstyle.load_stylesheet_pyqt5()
+        self.MainWindowApp.setStyleSheet(dark_stylesheet)
 
     def onTriggerHook(self) :
         self.ui.actionExit.triggered.connect(lambda: self.exit())

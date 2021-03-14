@@ -103,6 +103,7 @@ if __name__ == "__main__":
     database.addProgress("../resources/endata/l3.csv")
     database.addProgress("../resources/endata/l14.csv")
     data = database.showProgress()
+    print(data)
     print(database.getRange())
     database.addProgress("../resources/endata/l15.csv")
     print(database.getRange())

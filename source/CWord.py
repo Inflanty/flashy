@@ -177,7 +177,7 @@ class Word:
     def addRecord(self, row) :
         if self.__checkRecord(row):
             newID = self.getLastID() + 1
-            if row[4] != "IT" :
+            if row[4] == "NULL" :
                 link = "https://www.diki.pl/slownik-angielskiego?q=" + str(row[1].lower()).replace(" ", "+")
             else :
                 link = "NULL"
