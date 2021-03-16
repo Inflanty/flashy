@@ -20,7 +20,6 @@ class Statistics:
             logging.warning("File " + str(fileName) + " does not exist!")
 
     def getRange(self):
-        print(self.database.getLectureID())
         weeks = list(range(0, (self.database.getLectureID() + 1)))
         return weeks
 

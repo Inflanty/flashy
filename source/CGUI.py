@@ -50,7 +50,7 @@ class GUI :
         self.ui.actionExit.triggered.connect(lambda: self.exit())
         self.ui.actiondatabase.triggered.connect(lambda: self.fileNameOpen())
         self.ui.menuImport.triggered.connect(lambda: self.importData())
-        self.ui.actionNew.triggered.connect(lambda: self.newLecture())
+        self.ui.actionNew.triggered.connect(lambda: self.createNew())
         self.ui.actionSave.triggered.connect(lambda: self.saveChanges())
 
     def fileNameOpen(self) :
@@ -96,9 +96,20 @@ class GUI :
             self.MainWindow.setCentralWidget(self.edit.tabs)
             self.edit.dataPresent()
 
+    ## TODO: Check if object has an attribute first !
+    #        AttributeError: 'GUI' object has no attribute 'edit' - fastest with boolean
     def saveChanges(self) :
         if self.database != "NULL" :
-            self.database.updateRecords(self.edit.getEdited())
+            if self.edit.isActiveWindow() :
+                self.database.updateRecords(self.edit.getEdited())
+            elif self.newFile.isActiveWindow() :
+                self.database.updateRecords(self.newFile.getEdited())
+
+    def createNew(self) :
+        if self.database != "NULL" :
+            self.newLecture()
+        else :
+            self.newDatabase()
 
     def newLecture(self) :
         if self.database != "NULL" :
@@ -107,6 +118,26 @@ class GUI :
             self.new = NewSection()
             self.MainWindow.setCentralWidget(self.new.tabs)
             self.new.tabs.show()
+
+    def newDatabase(self) :
+        if self.__newDatabaseFile() :
+            self.new = NewSection()
+            self.MainWindow.setCentralWidget(self.new.tabs)
+            self.new.tabs.show()
+
+    def __newDatabaseFile(self) :
+        if self.database == "NULL" :   
+            currentPath = pathlib.Path().absolute()
+            self.newFile = QtWidgets.QFileDialog()
+            opentFileName = self.newFile.getSaveFileName(self.newFile, "Save File", "newDtabase", "Database Files (*.db)")
+            if str(opentFileName[0]) != "" :
+                logging.info("Created new file")
+                self.database = Statistics(str(opentFileName[0]))
+                self.plotDatabase()
+                self.createActionOnEdit(self.database.getRange())
+                return True
+        else :
+            return False
 
     def plotDatabase(self) :
         self.ui.graphicWidget = pg.PlotWidget()
