@@ -8,7 +8,7 @@ import logging, re
 class NewSection :
     ## NewSection Class constructor
     def __init__(self) :
-        self.columnCount = 4
+        self.columnCount = 5
         self.maxColumnWidth = 50
         self.tabs = QTableWidget(1, self.columnCount)
         self.tabs.updatesEnabled()
@@ -26,10 +26,13 @@ class NewSection :
     #  as a section data, the user can refer to a data from part. Lecture
     #  TODO: ADD option to write category
     def createNewSection(self) :
-        _horHeaders = ['Section ID', 'Word', 'Translation', 'Sentence']
+        _horHeaders = ['SECTION ID', 'WORD', 'TRANSLATION', 'CATEGORY', 'SENTENCE']
         self.tabs.setHorizontalHeaderLabels(_horHeaders)
         for _columns in range(self.columnCount) :
-            newitem = QTableWidgetItem('')
+            if _columns == 3 :
+                newitem = QTableWidgetItem('NULL')
+            else :
+                newitem = QTableWidgetItem('')
             self.tabs.setItem(0, _columns, newitem)
         self.tabs.horizontalHeader().setStretchLastSection(True)
         # Nothing in rows, minimal value
@@ -41,15 +44,15 @@ class NewSection :
         for _rows in range(self.tabs.rowCount()) :
             _rowContent = []
             for _columns in range(self.columnCount) :
-                _singleitem = self.tabs.item(_rows, _columns).text()
+                if _columns == 3 :
+                    _singleitem = self.tabs.item(_rows, 4).text()
+                elif _columns == 4 :
+                    _singleitem = self.tabs.item(_rows, 3).text()
+                else :
+                    _singleitem = self.tabs.item(_rows, _columns).text()
                 _rowContent.append(_singleitem)
             if self.__checkIfEdited(_rowContent) :
-                logging.info('The item has been edited ')
-                print(_rowContent)
                 _rowsContent.append(_rowContent)
-            else :
-                logging.info('The item has NOT been edited')
-                print(_rowContent)
         return _rowsContent
 
     def setNewRow(self) :

@@ -21,6 +21,7 @@ class GUI :
     database = "NULL"
     testme = []
     tabs = []
+    __active = None
 
     def __init__(self):
         self.MainWindowApp = QtWidgets.QApplication(sys.argv)
@@ -70,13 +71,13 @@ class GUI :
         self.ui.name = []
         self.ui.name.append(self.ui.action)
         self.ui.name[0] = self.ui.action
-        if len(lectureList) > 2 :
-            # Edit ALL
-            self.ui.name[0].setObjectName("ALL")
-            self.ui.menuEdit.addAction(self.ui.name[0])
-            self.ui.name[0].setText(QtCore.QCoreApplication.translate("MainWindow", "ALL"))
-            self.ui.name[0].triggered.connect(self.dbEdit)
-            # Lectures edit
+        # Edit ALL
+        self.ui.name[0].setObjectName("ALL")
+        self.ui.menuEdit.addAction(self.ui.name[0])
+        self.ui.name[0].setText(QtCore.QCoreApplication.translate("MainWindow", "ALL"))
+        self.ui.name[0].triggered.connect(self.dbEdit)
+        # Lectures edit
+        if len(lectureList) != 1 :
             for i in range(1, len(lectureList) + 1) :
                 self.ui.name.append(QtWidgets.QAction(self.MainWindow))
                 self.ui.name[i].setObjectName("Lecture " + str(i))
@@ -88,22 +89,21 @@ class GUI :
         if self.database != "NULL" :
             sender = self.MainWindow.sender()
             lectureID = sender.objectName()
-            if self.ui.graphicWidget.isActiveWindow() :
+            if self.__active == self.ui.graphicWidget :
                 self.plotDatabaseClose()
             if lectureID == "ALL" :
                 lectureID = 0
             self.edit = DatabaseEdit(self.database, lectureID)
             self.MainWindow.setCentralWidget(self.edit.tabs)
+            self.__setActive(self.edit)
             self.edit.dataPresent()
 
     ## TODO: Check if object has an attribute first !
     #        AttributeError: 'GUI' object has no attribute 'edit' - fastest with boolean
     def saveChanges(self) :
-        if self.database != "NULL" :
-            if self.edit.isActiveWindow() :
-                self.database.updateRecords(self.edit.getEdited())
-            elif self.newFile.isActiveWindow() :
-                self.database.updateRecords(self.newFile.getEdited())
+        logging.error("FIXME!")
+        #if self.database != "NULL" :
+        #    self.database.updateRecords(self.__active.getEdited())
 
     def createNew(self) :
         if self.database != "NULL" :
@@ -113,16 +113,18 @@ class GUI :
 
     def newLecture(self) :
         if self.database != "NULL" :
-            if self.ui.graphicWidget.isActiveWindow() :
+            if self.__active == self.ui.graphicWidget :
                 self.plotDatabaseClose()
             self.new = NewSection()
             self.MainWindow.setCentralWidget(self.new.tabs)
+            self.__setActive(self.new)
             self.new.tabs.show()
 
     def newDatabase(self) :
         if self.__newDatabaseFile() :
             self.new = NewSection()
             self.MainWindow.setCentralWidget(self.new.tabs)
+            self.__setActive(self.new)
             self.new.tabs.show()
 
     def __newDatabaseFile(self) :
@@ -142,6 +144,7 @@ class GUI :
     def plotDatabase(self) :
         self.ui.graphicWidget = pg.PlotWidget()
         self.MainWindow.setCentralWidget(self.ui.graphicWidget)
+        self.__setActive(self.ui.graphicWidget)
         self.ui.graphicWidget.setTitle("Test Plot", color="w", size="8pt")
         self.ui.graphicWidget.setLabel('left', 'Origins', units='')
         self.ui.graphicWidget.setLabel('bottom', 'Weeks', units='')
@@ -193,12 +196,15 @@ class GUI :
 
     def exit(self) :
         logging.info("Exit")
-        #self.MainWindowApp.aboutToQuit.connect(self.MainWindow.closeEvent())
         self.MainWindowApp.quit()
+    
+    def __setActive(self, active) :
+        self.__active = active
 
 if __name__ == "__main__":
     # TEST
     logging.basicConfig(level=logging.NOTSET)
+    logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     Application = GUI()
 
 #https://stackoverflow.com/questions/48256772/dark-theme-for-qt-widgets

@@ -5,7 +5,8 @@
 1,Ratio,"Workload is a worked hours to 8 hours ratio",Stosunek,NULL
 1,Workwise,"Is everything ok, workwise ?",W związku z pracą,NULL
 1,Narrative,"What is the type of nrrative in that novel ?",Naracja,NULL
-1,Narrative Arc,"The novel's narrative arc is deeply touching",Akcja/Przebieg,NULL2,Lease,My lease ending with the new year,Najem/Dzierżawa,NULL
+1,Narrative Arc,"The novel's narrative arc is deeply touching",Akcja/Przebieg,NULL
+2,Lease,My lease ending with the new year,Najem/Dzierżawa,NULL
 2,Factory,"There are a lot of illegal imigrants working in the factory.",Fabryka, NULL
 2,Fabric,"Cotto is a soft fabric.",Materiał,NULL
 2,Reserved,"The Swids are reserved people.",Powściągliwy/Skryty/Rezerwa,NULL
@@ -17,13 +18,16 @@
 2,Harbour,"You will see the slips in harbour area.",Port,NULL
 2,Borough,"Wrząsowice is a small vilage in Świątniki Górne borough.",Gmina,NULL
 2,District,"I've been living 15 years in Borek Fałęcki districkt.",Dzielnica,NULL
-2,Lightning,"There was enormous lightning over Wałbrzych",Błyskawica,NULL3,Flashcards,I use to learning with flashcards,Fiszki,NULL
-3,Course,I will continue English Course in new year,Kurs,NULL4,Storage,This room is beeing used for storage.,Składowanie/Pamięć,NULL
+2,Lightning,"There was enormous lightning over Wałbrzych",Błyskawica,NULL
+3,Flashcards,I use to learning with flashcards,Fiszki,NULL
+3,Course,I will continue English Course in new year,Kurs,NULL
+4,Storage,This room is beeing used for storage.,Składowanie/Pamięć,NULL
 4,Caper,I love caper in olive oil.,Kapar/Podskok,NULL
 4,Walnut,He gaved me a handful of wallnuts.,Orzech włoski,NULL
 4,Nut,I love cookies with nuts.,Orzech,NULL
 4,Varied,There are a lot of varied nations in Gothenburg.,Zróżnicowanty/Różnorodny,NULL
-4,Crayfish,He invited me on cryfish party.,Krab,NULL0,Consciousness,She's lost consciousness,Przytomność/Świadomość,21 Lessons intro
+4,Crayfish,He invited me on cryfish party.,Krab,NULL
+0,Consciousness,She's lost consciousness,Przytomność/Świadomość,21 Lessons intro
 0,Hone,I have to hone the code before PR.,Udoskonalić/Ostrzyć,21 Lessons intro
 0,Wisdom,You have great wsdom for such a young age.,Mądrość/Rozsądek,21 Lessons intro
 0,Overarching,To be or not to be stay an overarching question.,Naczelny/Nadrzędny,21 Lessons intro
@@ -36,16 +40,21 @@
 0,Embarking,The sailor embarked the ship.,Zaokrętowanie,21 Lessons intro
 0,Versatile,This app is extremally versatile.,Uniwersalny/Wszechstronny,21 Lessons intro
 0,Burgeoning,The population in India is burgeoning.,Rosnący w szybkim tempie.,21 Lessons intro
-0,Regime,The citizens wanted to rebel against the regime.,Reżim/Ustrój,21 Lessons intro6,Optimization,The Software optimization is very urgent matter in Embedded Programming.,Optymalizacja,NULL
+0,Regime,The citizens wanted to rebel against the regime.,Reżim/Ustrój,21 Lessons intro
+6,Optimization,The Software optimization is very urgent matter in Embedded Programming.,Optymalizacja,NULL
 6,Efficiency,"Efficiency is the ability to do something wlee, without wasting money and to much energy.",Efektywność,NULL
-6,Effectiveness,Effectiveness is the ability to produce a result that is intended and needed.,Skuteczność/Wrażenie,NULL7,Ribbon,She took long red ribbon.,Wstążka,NULL
-7,Look at,Why are you looking at me like that ?,Patrzeć na,NULL8,On the surface,The problem is not visible on the surface.,Z wierzchu,NULL
+6,Effectiveness,Effectiveness is the ability to produce a result that is intended and needed.,Skuteczność/Wrażenie,NULL
+7,Ribbon,She took long red ribbon.,Wstążka,NULL
+7,Look at,Why are you looking at me like that ?,Patrzeć na,NULL
+8,On the surface,The problem is not visible on the surface.,Z wierzchu,NULL
 8,Wary,I tried to tech her being wary.,Czujny/Rozważny,NULL
-8,Be wary of,Be wary of strangers.,Wystrzegać się,NULL9,Murmur,"I tried to murmure her a few simple words.",Szeptać,NULL
+8,Be wary of,Be wary of strangers.,Wystrzegać się,NULL
+9,Murmur,"I tried to murmure her a few simple words.",Szeptać,NULL
 9,Marble,"This pizza stone is shaped from marble.",Marmur,NULL
 9,Affluent,"They are not reach, they are affluent!",Majętny/Bogaty,NULL
 9,Looting,"The looting are pretty common during riot times.",Grabież/Plądrowanie,NULL
-9,Jew,"The largest minority in Poland before WW2 were Jews.",Żyd,NULL10,Bus network,"Can is robust bus network.","Sieć o topologii magistrali",IT
+9,Jew,"The largest minority in Poland before WW2 were Jews.",Żyd,NULL
+10,Bus network,"Can is robust bus network.","Sieć o topologii magistrali",IT
 10,Bus,"First you have to connect to the bus.","Magistrala",IT
 10,Cabling,"The cabling here is very messy.","Okablowanie",IT
 10,Closed loop,"Closed loop control require robust sensor.","Zamknięta pętla",IT
@@ -59,7 +68,8 @@
 10,Storage area,"Heap is a sorage area in memory for dynamic data allocation.","Obszar składowania",IT
 10,Storage resources,"Storage resources is total amount of memory for MCU system.","Zasoby pamięci",IT
 10,Subset,"All subset of commands needs superior ID.","Podzbiór",IT
-10,Switch,"Switch is able to route internet traffic.","Przełącznik",IT11,Assocaition rule,"The Association rule is do not tolk about the cloub.","Reguła stoważyszenia",IT
+10,Switch,"Switch is able to route internet traffic.","Przełącznik",IT
+11,Assocaition rule,"The Association rule is do not tolk about the cloub.","Reguła stoważyszenia",IT
 11,Back propagation,"This fault is coused by back propagation.","Propagacja wsteczna",IT
 11,Bar code,"We have to preare new bar codes for our products.","Kod kreskowy",IT
 11,Branch,"Delete each branch after merge to main.","Gałąź",IT
@@ -87,7 +97,8 @@
 11,Running time,"Total running time has to be availble through diagnostics data.","Czas wykonywania",IT
 11,Scalable,"The code has to be scallable an well mantained.","Skalowalny",IT
 11,Splitting paths,"Splitting pats are crating lot of logical issues.","Schodzące się ścieżki",IT
-11,Spurious pattern,"Outliers will create spurious pattern.","Fałszywy wzorzec",IT12,Polite,"It's not polite to talk like that","Uprzejme/grzeczne",NULL
+11,Spurious pattern,"Outliers will create spurious pattern.","Fałszywy wzorzec",IT
+12,Polite,"It's not polite to talk like that","Uprzejme/grzeczne",NULL
 12,Bond,"The bond market has gone up recently","Obligacja/więź",NULL
 12,Accidential power outage,"The system crushed becouse of accidential power outage","Nagła przerwa w dostawie prądu",IT
 12,Actuator,"The arm is controlled by an actuator","Serwomechanizm",IT
@@ -98,17 +109,24 @@
 12,Drive bay,"Hard disks drive bay nededs cleaning","Kieszeń napędu",IT
 12,Head crash,"The datapath is unreachable becous of head crash","Uszkodzenie głowicy",IT
 12,Jumper,"Put this jumper back to enable CAN termination","Zworka",IT
-12,Platter,"I bought a jazz plater","Płyta gramofonowa/plater",IT13,Choir,"I'm totaly enrapture by this choir","Chór",NULL
-13,Chives,"Chop this chives please","Szczypiorek",NULL14,Vaccine,"There is a lot of labolatories produccing vaccines.","Szczepionka",NULL
+12,Platter,"I bought a jazz plater","Płyta gramofonowa/plater",IT
+13,Choir,"I'm totaly enrapture by this choir","Chór",NULL
+13,Chives,"Chop this chives please","Szczypiorek",NULL
+14,Vaccine,"There is a lot of labolatories produccing vaccines.","Szczepionka",NULL
 14,Vaccinated,"Half of society is already vaccineted.","Szczepienie",NULL
-14,Get vaccinated,"Allmost all citizens have to get vaccinated.","Zaszczepić się",NULL15,Sceptic,"He is rather sceptic person.","Sceptyk",NULL
+14,Get vaccinated,"Allmost all citizens have to get vaccinated.","Zaszczepić się",NULL
+15,Sceptic,"He is rather sceptic person.","Sceptyk",NULL
 15,Sceptical,"He is very sceptical in terms of vaccines.","Sceptyczny",NULL
-15,LLC,"Limited Liability Company.","Spółka z ograniczoną odpowiedzialnością",NULL16,Rearview mirror,"She blinked at me from rearview mirror.","Lusterko wsteczne",NULL
-16,Toddler,"Your toddler seens your attention.","Brzdąc/berbeć",NULL17,Ice skates,"Put your ice skates before you entry ice rink.","Łyżwy",NULL
+15,LLC,"Limited Liability Company.","Spółka z ograniczoną odpowiedzialnością",NULL
+16,Rearview mirror,"She blinked at me from rearview mirror.","Lusterko wsteczne",NULL
+16,Toddler,"Your toddler seens your attention.","Brzdąc/berbeć",NULL
+17,Ice skates,"Put your ice skates before you entry ice rink.","Łyżwy",NULL
 17,Draw lots,"They draw lots during the contest.","Ciągnąć losy",NULL
 17,Pathetic,"It is just pathetic, your artificial loneliness in huge city.","Żałosny",NULL
-17,Court,"They open a case in the court.","Sąd",NULL19,Scent,"I can smell the beautifull scent of the candle.","Zapach",NULL
-19,Air out,"They have to air out the court after the judge had eaten surstruming.","Wietrzyć",NULL21,Bathe,"We took romantic ice bathe after we had had vodka.","Kąpiać się",NULL
+17,Court,"They open a case in the court.","Sąd",NULL
+19,Scent,"I can smell the beautifull scent of the candle.","Zapach",NULL
+19,Air out,"They have to air out the court after the judge had eaten surstruming.","Wietrzyć",NULL
+21,Bathe,"We took romantic ice bathe after we had had vodka.","Kąpiać się",NULL
 21,Poodle,"Don't be such a poodle!","Pudel/Sługus",NULL
 21,Puddle,"There were big puddles by the side of the road.",""Kałuża/Taplać się,NULL
 21,Breath,"Take a big breath!","Oddech/Wdech",NULL
@@ -116,5 +134,6 @@
 21,Belittle,"Is sounds as if you trying to belittle others' achievments!","Umniejszać",NULL
 21,Happy with,"I'm happy with my goals","Zadowolonym z ...",NULL
 21,Pebble,"I hate those fucking pebbles in my shoes!!!","Kamyk",NULL
-21,Dice,"Let's roll a dice!","Kostka do gry/Kroić w kostkę",NULL22,Pupils,"A new pupils are always very focused during first class.","Uczniowie",NULL
+21,Dice,"Let's roll a dice!","Kostka do gry/Kroić w kostkę",NULL
+22,Pupils,"A new pupils are always very focused during first class.","Uczniowie",NULL
 22,Cough,"Cover your mouth if you have a cough.","Kaszel",NULL

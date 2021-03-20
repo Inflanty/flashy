@@ -16,11 +16,11 @@ class DatabaseEdit :
         if lectureID == 0 :
             # entire database edit
             self.lectureID = lectureID
-            self.DBRowCount = self.database.getRecords()
+            self.DBRowCount = self.database.getRecordsNumber() - 1
         else :
             self.lectureID = re.findall(r'\d+', lectureID)[0]
             self.DBRowCount = self.database.countRecordsByLecture(self.lectureID)
-        self.itemsUpdated = [[]]
+        self.itemsUpdated = []
         # We do not want to have origin ID and link from db
         self.tabs = QTableWidget(self.DBRowCount, self.DBColumnCount)
         self.tabs.updatesEnabled()
@@ -37,11 +37,11 @@ class DatabaseEdit :
         # The data can be edited as a blob of data
         #  OR in lecture mode
         if (self.lectureID == 0) :
-            _rowsContent = self.database.getRecordsFromDatabase()
+            _rowsContent = self.database.getRecords()
         else :
             _rowsContent = self.database.getRecordsFromLecture(self.lectureID)
         # Every item has own data, pulled from database
-        for _rows in range(self.DBRowCount) :
+        for _rows in range(len(_rowsContent)) :
             # TODO: restrict item ID from editing
             for _columns in range(6) :
                 newitem = QTableWidgetItem(str(_rowsContent[_rows][0][_columns]))
@@ -76,23 +76,21 @@ class DatabaseEdit :
         _rowContent = []
         for _columns in range (self.DBColumnCount) :
             _singleitem = self.tabs.item(_row, _columns).text()
-            if _columns == 0 :
-                _listItem = self.__getMyListItem(_singleitem)
-            logging.info(str(_listItem) + '_' + str(_columns) + ' = ' + str(_singleitem))
-            self.itemsUpdated[_listItem][_columns] = _singleitem
-        logging.warning(self.itemsUpdated)
+            _rowContent.append(_singleitem)
+        self.__updateMyItems(_rowContent)
 
     ## Updated row should be saved in itemsUpdated list,
     #  if particular ID already exist, it has to be updated in the same place
-    #  @param itemID ID of the item to be updated
-    #  @return position on list to be updated with provided itemID
-    def __getMyListItem(self, itemID) :
+    #  @param rowOfItems row of items to be updated
+    #  @return None if position exist
+    def __updateMyItems(self, rowOfItems) :
         _len = len(self.itemsUpdated)
         if _len > 0 :
             for _singleRow in range(_len) :
-                if (itemID in self.itemsUpdated[_singleRow]) :
-                    return _singleRow
-        return _len
+                if (rowOfItems[0] == self.itemsUpdated[_singleRow][0]) :
+                    self.itemsUpdated[_singleRow] = rowOfItems
+                    return
+        self.itemsUpdated.append(rowOfItems)
 
     ## To allow edited data save, the class should return edited data
     #  @return Edited rows content

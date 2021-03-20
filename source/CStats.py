@@ -1,5 +1,4 @@
 import os.path
-import matplotlib.pyplot as plt
 import numpy as np
 from CWord import Word
 import logging
@@ -44,27 +43,7 @@ class Statistics:
         lecturesIDs = self.database.getLectureIDs(lectureID)
         for row in lecturesIDs :
             logging.info(row[0])
-            self.database.deleteRecord(row[0])
-
-    def showProgressGraph(self):
-        x = [0,1,2,3]
-        y = self.showProgress()
-        plt.plot(x, y, 'bo')
-        # plot approximated data
-        plt.title("English progress : " + self.name)
-        plt.grid(True)
-        plt.winter()
-        plt.show()
-
-    def saveProgressGraph(self, fileName):
-        x = [0,1,2,3]
-        y = self.showProgress()
-        plt.plot(x, y, 'bo')
-        # plot approximated data
-        plt.title("English progress : " + self.name)
-        plt.grid(True)
-        plt.winter()
-        plt.savefig(fileName, bbox_inches='tight')        
+            self.database.deleteRecord(row[0]) 
 
     def countRecordsByLecture(self, lectureID):
         return len(self.database.getLectureIDs(lectureID))
@@ -74,20 +53,25 @@ class Statistics:
 
     def getRecordFromLecture(self, lectureID, row) :
         lectureIDs = self.database.getLectureIDs(lectureID)
-        return self.database.getRow(lectureIDs[0][0] + row)
+        return self.database.getRow(lectureIDs + row)
 
     def getRecordsFromLecture(self, lectureID) :
         _lectureRows = []
         lectureIDs = self.database.getLectureIDs(lectureID)
-        for _row in range(self.countRecordsByLecture(lectureID)) :
-            _lectureRows.append(self.database.getRow(lectureIDs[0][0] + _row))
+        for _row in range(len(lectureIDs)) :
+            _lectureRows.append(self.database.getRow(lectureIDs[_row]))
         return _lectureRows
 
     def getRecord(self, row) :
-        return self.database.show(row)
+        return self.database.getRow(row)
 
     def getRecords(self) :
-        return self.database.show('ALL')
+        _lectureRows = []
+        for _row in range(1, self.getRecordsNumber()) :
+            _lectureRows.append(self.database.getRow(_row))
+        return _lectureRows
+
+        return self.database.present()
 
     def updateRecords(self, data) :
         self.database.updateSection(data)
@@ -97,13 +81,11 @@ class Statistics:
 if __name__ == "__main__":
     # TEST
     # Take a data from DBgetRecordsFromLecture
-    database = Statistics("mem")
-    database.addProgress("../resources/endata/l1TEST.csv")
-    database.addProgress("../resources/endata/l3.csv")
-    database.addProgress("../resources/endata/l14.csv")
-    data = database.showProgress()
-    print(data)
-    print(database.getRange())
-    database.addProgress("../resources/endata/l15.csv")
-    print(database.getRange())
+    database = Statistics("engdata.db")
+    _rowsContent = database.getRecords()
+    #print(_rowsContent)
+    for _rows in range(1, len(_rowsContent)) :
+        for _columns in range(6) :
+            print(_rowsContent[_rows][0][_columns])
+            pass
 

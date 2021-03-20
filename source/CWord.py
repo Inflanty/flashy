@@ -73,11 +73,13 @@ class Word:
     #  TODO: This will return last lecture ID only when we have an increasing order in the db,
     #        We don't want to limit ourselfes to keep the order
     def getLectureID(self) :
-        try:
-            self.cursorDB.execute("SELECT lectureID FROM " + self.tableName + " ORDER BY lectureID DESC LIMIT 1")
-            lectureID = self.cursorDB.fetchall()[0][0]
-        except IndexError:
-            lectureID = 0
+        with self.connDB:
+            try:
+                self.cursorDB.execute("SELECT lectureID FROM " + self.tableName + " ORDER BY lectureID DESC LIMIT 1")
+                lectureID = self.cursorDB.fetchall()[0][0]
+            except IndexError:
+                lectureID = 0
+                logging.error("Index Error!")
         return lectureID
 
     ## Get all origins from lecture
@@ -147,14 +149,17 @@ class Word:
     #  @param lectureID
     #  @return IDs list
     def getLectureIDs(self, lectureID) :
+        listIDs = []
         try:
             self.cursorDB.execute("SELECT originID FROM " + self.tableName + " WHERE lectureID = " + str(lectureID))
             IDs = self.cursorDB.fetchall()
+            for index in range(len(IDs)) :
+                listIDs.append(IDs[index][0])
         except IndexError:
-            IDs = 'N/A'
+            listIDs = 'N/A'
         except sqlite3.OperationalError:
-            IDs = 'N/A'
-        return IDs
+            listIDs = 'N/A'
+        return listIDs
 
     ## Get IDs of database
     #  @return IDs list
@@ -190,7 +195,7 @@ class Word:
                         'trans'  : row[3],
                         'category'  : row[4],
                         'dikiLink' : link})
-            logging.info('Added record : ' + row[1])
+                logging.warning('Added record : ' + row[1])
 
     ## Delete record from database
     #  @param ID of record to delete
@@ -200,7 +205,7 @@ class Word:
                 try :
                     self.cursorDB.execute("DELETE FROM " + self.tableName + " WHERE originID = " + str(ID))
                 except sqlite3.OperationalError :
-                    logging.warning('Element not exist!')
+                    logging.error('Element not exist!')
         else :
             logging.error('Error! Row format : [lectureID, origin, sentence, trans, category]')
 
@@ -271,8 +276,7 @@ class Word:
     def present(self) :
         self.cursorDB.execute("SELECT * FROM " + self.tableName)
         table = self.cursorDB.fetchall()
-        for i in table :
-            logging.info(i)
+        return table
 
     ## Close connection to database
     def closeConnection(self) :
@@ -289,9 +293,9 @@ class Word:
         if (len(row) == 5) and not ("#" in row[0]):
             if  row[0].isdigit() and not any(map(str.isdigit, row[1])) and not any(map(str.isdigit, row[3])) and not any(map(str.isdigit, row[4])) :
                 return True
-        logging.error("Wrong row format :\nLecture ID : " + row[0] + 
-                      "\nOrigin : " + row[1] + 
-                      "\nSentence : " + row[2] + 
-                      "\nTranslation : " + row[3] + 
-                      "\nCategory : " + row[4])
+        logging.error("Wrong row format :\n\tLecture ID : " + row[0] + 
+                      "\n\tOrigin : " + row[1] + 
+                      "\n\tSentence : " + row[2] + 
+                      "\n\tTranslation : " + row[3] + 
+                      "\n\tCategory : " + row[4])
         return False
