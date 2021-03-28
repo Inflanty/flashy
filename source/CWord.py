@@ -61,11 +61,11 @@ class Word:
     ## Get column names from database
     #  @return list with columns name
     def getColumnNames(self) :
-        self.cursorDB.execute("SELECT * FROM record")
-        names = []
-        colnames = self.cursorDB.description
-        for row in colnames:
-            names.append(row[0])
+        #self.cursorDB.execute("SELECT * FROM record")
+        #colnames = self.cursorDB.description
+        #for row in colnames:
+            # names.append(row[0])
+        names = ["ID", "LECTURE", "ORIGIN", "SENTENCE", "TRANSLATION", "CATEGORY", "Diki LINK"]
         return names
 
     ## Get last lecture, could be use for all lectures counting
@@ -78,8 +78,8 @@ class Word:
                 self.cursorDB.execute("SELECT lectureID FROM " + self.tableName + " ORDER BY lectureID DESC LIMIT 1")
                 lectureID = self.cursorDB.fetchall()[0][0]
             except IndexError:
+                # The execution will return error if DB is empty
                 lectureID = 0
-                logging.error("Index Error!")
         return lectureID
 
     ## Get all origins from lecture
@@ -231,6 +231,13 @@ class Word:
     #  The row has to be in right format here
     def exportCSV(self) :
         CSVReader.run()
+
+    ## Add section, format of data should be same as for addRecord()
+    #  @param data - data to be added
+    def addSection(self, data) :
+        for _row in data :
+           self.addRecord(_row)
+           logging.info("Added row : " + str(_row))       
 
     ## Edit section in database
     #  @param data - entire and edited lectures data

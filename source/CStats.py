@@ -76,6 +76,9 @@ class Statistics:
     def updateRecords(self, data) :
         self.database.updateSection(data)
 
+    def addRecords(self, data) :
+        self.database.addSection(data)
+
 
 
 if __name__ == "__main__":

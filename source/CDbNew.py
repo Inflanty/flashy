@@ -26,7 +26,7 @@ class NewSection :
     #  as a section data, the user can refer to a data from part. Lecture
     #  TODO: ADD option to write category
     def createNewSection(self) :
-        _horHeaders = ['SECTION ID', 'WORD', 'TRANSLATION', 'CATEGORY', 'SENTENCE']
+        _horHeaders = ['SECTION', 'WORD', 'TRANSLATION', 'CATEGORY', 'SENTENCE']
         self.tabs.setHorizontalHeaderLabels(_horHeaders)
         for _columns in range(self.columnCount) :
             if _columns == 3 :
@@ -44,15 +44,10 @@ class NewSection :
         for _rows in range(self.tabs.rowCount()) :
             _rowContent = []
             for _columns in range(self.columnCount) :
-                if _columns == 3 :
-                    _singleitem = self.tabs.item(_rows, 4).text()
-                elif _columns == 4 :
-                    _singleitem = self.tabs.item(_rows, 3).text()
-                else :
-                    _singleitem = self.tabs.item(_rows, _columns).text()
+                _singleitem = self.tabs.item(_rows, _columns).text()
                 _rowContent.append(_singleitem)
             if self.__checkIfEdited(_rowContent) :
-                _rowsContent.append(_rowContent)
+                _rowsContent.append(self.__mapRowToDbFormat(_rowContent))
         return _rowsContent
 
     def setNewRow(self) :
@@ -92,3 +87,11 @@ class NewSection :
             if re.match("^(?![\s\S])", _item) == None :
                 return True
         return False
+
+    def __mapRowToDbFormat(self, row) :
+        # Columns in the class are mixed compare to db
+        _columnMap = [0, 1, 4, 2, 3]
+        _rowMapped = []
+        for _item in range(len(row)) :
+            _rowMapped.append(row[_columnMap[_item]])
+        return _rowMapped

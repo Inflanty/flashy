@@ -22,6 +22,8 @@ class GUI :
     testme = []
     tabs = []
     __active = None
+    edit = None
+    new = None
 
     def __init__(self):
         self.MainWindowApp = QtWidgets.QApplication(sys.argv)
@@ -41,6 +43,7 @@ class GUI :
             self.database = "NULL"
         else :
             pass
+        self.__setActive(None)
         self.MainWindowApp.quit()
     
     def __setPalette(self) :
@@ -101,9 +104,12 @@ class GUI :
     ## TODO: Check if object has an attribute first !
     #        AttributeError: 'GUI' object has no attribute 'edit' - fastest with boolean
     def saveChanges(self) :
-        logging.error("FIXME!")
-        #if self.database != "NULL" :
-        #    self.database.updateRecords(self.__active.getEdited())
+        if  self.__active == self.edit :            
+            self.database.updateRecords(self.__active.getEdited())
+        elif self.__active == self.new :
+            self.database.addRecords(self.__active.getEdited())
+        else :
+            logging.warning("Nothing to be saved")
 
     def createNew(self) :
         if self.database != "NULL" :

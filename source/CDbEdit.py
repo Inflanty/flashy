@@ -43,12 +43,13 @@ class DatabaseEdit :
         # Every item has own data, pulled from database
         for _rows in range(len(_rowsContent)) :
             # TODO: restrict item ID from editing
-            for _columns in range(6) :
+            for _columns in range(self.DBColumnCount) :
                 newitem = QTableWidgetItem(str(_rowsContent[_rows][0][_columns]))
                 self.tabs.setItem(_rows, _columns, newitem)
         self.tabs.cellChanged.connect(self.itemUpdateClbk)
         self.tabs.resizeColumnsToContents()
         self.tabs.resizeRowsToContents()
+        self.tabs.setColumnHidden(0, True)
         self.tabs.show()
 
     ## Get selected row
