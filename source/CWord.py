@@ -168,8 +168,22 @@ class Word:
             self.cursorDB.execute("SELECT originID FROM " + self.tableName)
             IDs = self.cursorDB.fetchall()
         except IndexError:
-            IDs = 'N/A'
+            IDs = 0
         return IDs
+
+    ## Get lectures of database
+    #  @return IDs list
+    def getAllLectures(self) :
+        try:
+            self.cursorDB.execute("SELECT lectureID FROM " + self.tableName)
+            IDs = self.cursorDB.fetchall()
+            lectures = []
+            for lecture in range(len(IDs)) :
+                if lecture not in lectures :
+                   lectures.append(lecture)
+        except IndexError:
+            lectures = [0]
+        return lectures
 
     ## Add single row to database
     #  @param row to add
@@ -243,8 +257,8 @@ class Word:
     #  @param data - entire and edited lectures data
     def updateSection(self, data) :
         for _row in data :
-            self.updateRow(_row)
-            logging.info("Updated row : " + str(_row))
+            if self.updateRow(_row) :
+                logging.info("Updated row : " + str(_row))
 
     ## Edit row in database
     #  @param row - row data (list)
@@ -261,8 +275,10 @@ class Word:
                                           """lectureID = :lectureID """ +
                                           """ WHERE originID = :originID""",
                                           {'originID': row[0], 'lectureID': row[1], 'origin':row[2], 'sentence': row[3], 'trans':row[4], 'category': row[5]})
+                    return True
                 except IndexError:
                     logging.error("IndexError")
+        return False
 
     ## Swow single row
     #  @param row to print

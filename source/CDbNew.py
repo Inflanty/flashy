@@ -24,7 +24,6 @@ class NewSection :
 
     ## As a main class functionality, we provide here an option to create new section,
     #  as a section data, the user can refer to a data from part. Lecture
-    #  TODO: ADD option to write category
     def createNewSection(self) :
         _horHeaders = ['SECTION', 'WORD', 'TRANSLATION', 'CATEGORY', 'SENTENCE']
         self.tabs.setHorizontalHeaderLabels(_horHeaders)
@@ -52,7 +51,6 @@ class NewSection :
 
     def setNewRow(self) :
         _row = self.tabs.rowCount()
-        # Store previouse ID
         sectionID = self.tabs.item(_row - 1, 0).text()
         logging.info('New row : ' + str(_row))
         self.tabs.insertRow(_row)

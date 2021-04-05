@@ -24,6 +24,7 @@ class GUI :
     __active = None
     edit = None
     new = None
+    version = "alpha"
 
     def __init__(self):
         self.MainWindowApp = QtWidgets.QApplication(sys.argv)
@@ -56,6 +57,7 @@ class GUI :
         self.ui.menuImport.triggered.connect(lambda: self.importData())
         self.ui.actionNew.triggered.connect(lambda: self.createNew())
         self.ui.actionSave.triggered.connect(lambda: self.saveChanges())
+        self.ui.actionVersion.triggered.connect(lambda: self.popupHelp())
 
     def fileNameOpen(self) :
         if self.database == "NULL" :   
@@ -134,18 +136,18 @@ class GUI :
             self.new.tabs.show()
 
     def __newDatabaseFile(self) :
-        if self.database == "NULL" :   
-            currentPath = pathlib.Path().absolute()
-            self.newFile = QtWidgets.QFileDialog()
-            opentFileName = self.newFile.getSaveFileName(self.newFile, "Save File", "newDtabase", "Database Files (*.db)")
-            if str(opentFileName[0]) != "" :
-                logging.info("Created new file")
-                self.database = Statistics(str(opentFileName[0]))
-                self.plotDatabase()
-                self.createActionOnEdit(self.database.getRange())
-                return True
-        else :
-            return False
+        if self.database != "NULL" :
+            del self.database
+            self.database = "NULL"
+        currentPath = pathlib.Path().absolute()
+        self.newFile = QtWidgets.QFileDialog()
+        opentFileName = self.newFile.getSaveFileName(self.newFile, "Save File", "newDtabase", "Database Files (*.db)")
+        if str(opentFileName[0]) != "" :
+            logging.info("Created new file")
+            self.database = Statistics(str(opentFileName[0]))
+            self.plotDatabase()
+            self.createActionOnEdit(self.database.getRange())
+            return True
 
     def plotDatabase(self) :
         self.ui.graphicWidget = pg.PlotWidget()
@@ -190,6 +192,27 @@ class GUI :
                 self.listwidget.insertItem(0, "Lecture " + str(i))
             self.listwidget.clicked.connect(self.clicked)
             self.listwidget.show()
+
+    def popupHelp(self) :
+        helpWindow = QMessageBox()
+        helpWindow.setWindowTitle("Help")
+        helpWindow.setText(str(self.version))
+        helpWindow.setIcon(QMessageBox.Information)
+        helpWindow.setStandardButtons(QMessageBox.Ignore)
+        if  self.__active == self.edit :
+            helpWindow.setInformativeText("See details, for avilable commands!")
+            helpWindow.setDetailedText("No details")
+        elif self.__active == self.new :
+            helpWindow.setInformativeText("See details, for avilable commands!")
+            helpWindow.setDetailedText("- ctrl + R : Add new row\n- ctrl + delete : Delete marked rows")
+        else :
+            if self.database == "NULL" :
+                helpWindow.setInformativeText("The database is not loaded.\nTo load database go to file and see options.")
+            else :
+                helpWindow.setInformativeText("The database is loaded.\nYou can edit the database and add a new data.")
+
+        helpWindowHndler = helpWindow.exec_()
+
 
     def clicked(self) :
         item = self.listwidget.currentItem()

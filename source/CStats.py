@@ -9,7 +9,7 @@ class Statistics:
         self.database = Word(databaseName)
 
     def __del__(self):
-        pass
+        self.database.closeConnection()
 
     def addProgress(self, fileName):
         if os.path.isfile(fileName):
