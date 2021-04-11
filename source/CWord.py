@@ -196,6 +196,8 @@ class Word:
     def addRecord(self, row) :
         if self.__checkRecord(row):
             newID = self.getLastID() + 1
+            if newID != row[0] :
+                logging.warning("Element has wrong ID : " + row[0])
             if row[4] == "NULL" :
                 link = "https://www.diki.pl/slownik-angielskiego?q=" + str(row[1].lower()).replace(" ", "+")
             else :
@@ -203,13 +205,56 @@ class Word:
             with self.connDB:
                 self.cursorDB.execute("INSERT INTO " + self.tableName + " VALUES (:originID, :lectureID, :origin, :sentence, :trans, :category, :dikiLink)",
                         {'originID' : newID,
-                        'lectureID' : row[0],
-                        'origin'  :  row[1],
-                        'sentence'  : row[2],
-                        'trans'  : row[3],
-                        'category'  : row[4],
+                        'lectureID' : row[1],
+                        'origin'  :  row[2],
+                        'sentence'  : row[3],
+                        'trans'  : row[4],
+                        'category'  : row[5],
                         'dikiLink' : link})
-                logging.warning('Added record : ' + row[1])
+                logging.warning('Added record : ' + newID)
+
+    ## The record can be inserted to the db
+    #  @breif update and adding new record should be accessible from this point
+    #  @param row to add
+    #         row format :
+    #         [0] Record ID
+    #         [1] Lecture ID
+    #         [2] Origin
+    #         [3] Sentence contains origin
+    #         [4] Traslation of origin
+    #         [5] Origin category
+    def insertRecord(self, row) :
+        newID = self.getLastID()
+        if newID < int(row[0]) :
+            # New element
+            self.addRecord(row)
+        else :
+            # Updated
+            self.updateRow(row)
+
+    ## The records can be inserted as a list
+    #  @brief Iterate through the list and parse row further
+    #  @param data - list with rows    
+    def insertRecords(self, data) :
+        for row in data :
+            logging.debug("Row format :\n\t" + row[0] + 
+                      "\n\t" + row[1] + 
+                      "\n\t" + row[2] + 
+                      "\n\t" + row[3] + 
+                      "\n\t" + row[4] +
+                      "\n\t" + row[5])
+            self.insertRecord(row)
+
+    ## The records can be inserted as a list
+    #  @brief Iterate through the list and parse the ID further
+    #  @param data - list with IDs to delete 
+    def deleteRecords(self, data) :
+        lastID = self.getLastID()
+        for index in range(len(data)) :
+            if data[index] > lastID :
+                logging.debug("Nothing to delete")
+            else :
+                self.deleteRecord(data[index])
 
     ## Delete record from database
     #  @param ID of record to delete
@@ -218,10 +263,28 @@ class Word:
             with self.connDB:
                 try :
                     self.cursorDB.execute("DELETE FROM " + self.tableName + " WHERE originID = " + str(ID))
+                    logging.debug("Deleted row : " + str(ID))
                 except sqlite3.OperationalError :
                     logging.error('Element not exist!')
+            self.__refreshIDs(int(ID) + 1)
         else :
             logging.error('Error! Row format : [lectureID, origin, sentence, trans, category]')
+
+    ## Data could be deleted in the middle, the ID should be updated
+    #  @brief Update EVERY ID after given one to value 'ID - 1'
+    #  @param oldID - ID to start with refresh
+    def __refreshIDs(self, oldID) :
+        _lastID = self.getLastID() - 1 
+        if oldID != _lastID :
+            with self.connDB:
+                try:
+                    self.cursorDB.execute("""UPDATE """ + self.tableName + 
+                                          """ SET  originID = originID-1""" +
+                                          """ WHERE originID > :oldID""",
+                                          {'oldID': oldID})
+                    return True
+                except IndexError:
+                    logging.error("IndexError")
 
     ## Import CSV file to database
     #  @param filename
@@ -280,15 +343,16 @@ class Word:
                     logging.error("IndexError")
         return False
 
-    ## Swow single row
-    #  @param row to print
-    def getRow(self, row) :
-        self.cursorDB.execute("SELECT * FROM " + self.tableName + " WHERE originID = " + str(row))
+    ## Get single row
+    #  @param rowNumber - Number of row to be returned
+    def getRow(self, rowNumber) :
+        self.cursorDB.execute("SELECT * FROM " + self.tableName + " WHERE originID = " + str(rowNumber))
         return self.cursorDB.fetchall()
 
-    ## Swow single row
-    #  @param row to print
-    def get(self, lectureID = 0) :
+    ## Get rows from lecture
+    #  @param lectureID - ID of Lecture containing the data to be returned
+    #  NOTE: If not specified, return data from entire database
+    def getRows(self, lectureID = 0) :
         elements = ""
         if (lectureID != 0) :
             elements = " WHERE lectureID = " + str(lectureID)
@@ -313,12 +377,13 @@ class Word:
     #  before we can add it to the database
     #  @param row to check
     def __checkRecord(self, row) :
-        if (len(row) == 5) and not ("#" in row[0]):
-            if  row[0].isdigit() and not any(map(str.isdigit, row[1])) and not any(map(str.isdigit, row[3])) and not any(map(str.isdigit, row[4])) :
+        if (len(row) == 6) and not ("#" in row[0]):
+            if  row[0].isdigit() and \
+                row[1].isdigit() and \
+                not any(map(str.isdigit, row[2])) and \
+                not any(map(str.isdigit, row[4])) and \
+                not any(map(str.isdigit, row[5])) :
                 return True
-        logging.error("Wrong row format :\n\tLecture ID : " + row[0] + 
-                      "\n\tOrigin : " + row[1] + 
-                      "\n\tSentence : " + row[2] + 
-                      "\n\tTranslation : " + row[3] + 
-                      "\n\tCategory : " + row[4])
+        logging.error("Wrong row format : " +
+                      "\n\tID : "           + row[0])
         return False

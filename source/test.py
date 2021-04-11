@@ -51,5 +51,16 @@ line.setBounds([0,200])
 ## Start Qt event loop unless running in interactive mode or using pyside.
 if __name__ == '__main__':
     import sys
-    if (sys.flags.interactive != 1) or not hasattr(QtCore, 'PYQT_VERSION'):
-        QtGui.QApplication.instance().exec_()
+    #if (sys.flags.interactive != 1) or not hasattr(QtCore, 'PYQT_VERSION'):
+    #    QtGui.QApplication.instance().exec_()
+    tabEdit = [1, 3, 5, 7]
+    tabCopy = tabEdit
+    tabEdit[0] = 0
+    print(tabEdit)
+    print(tabCopy)
+
+    varEdit = 1
+    varCopy = varEdit
+    varEdit = 0
+    print(varEdit)
+    print(varCopy)

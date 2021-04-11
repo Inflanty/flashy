@@ -5,7 +5,7 @@ import sqlite3
 import csv
 
 
-with open('l1.csv', newline='', encoding='utf-8') as f:
+with open('../resources/endata/engdata.csv', newline='', encoding='utf-8') as f:
     reader = csv.reader(f)
     #for row in reader:
         #print(row)
@@ -74,11 +74,14 @@ c.execute("INSERT INTO " + name + " VALUES (:originID, :origin, :sentence, :tran
     'dikiLink' : dikiLink})
 conn.commit()
 
-c.execute("DELETE FROM " + name + " WHERE originID = " + str(2))
-c.execute("SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%' ORDER BY 1;")
-print(c.fetchall())
+index = 2
 
-c.execute("select * from record")
+c.execute("""UPDATE """ + name + 
+                                              """ SET  originID = :newID""" +
+                                              """ WHERE originID = :originID""",
+                                              {'originID': index, 'newID': index - 1})
+
+c.execute("SELECT * FROM " + name)
 print(c.fetchall())
 
 conn.close()

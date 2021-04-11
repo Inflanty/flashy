@@ -11,6 +11,9 @@ class Statistics:
     def __del__(self):
         self.database.closeConnection()
 
+    def getDatabase(self) :
+        return self.database
+
     def addProgress(self, fileName):
         if os.path.isfile(fileName):
             self.database.importCSV(fileName)

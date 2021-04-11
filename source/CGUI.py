@@ -1,4 +1,4 @@
-import sys
+import sys, os
 import pathlib
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMessageBox, QComboBox, QListWidget
@@ -9,10 +9,13 @@ import pyqtgraph.examples
 
 from CMainWindow import Ui_MainWindow
 from CFileBrowser import Ui_FileBrowser
-from CStats import Statistics
+from CWord import Word
 from CSVReader import MyWindow
-from CDbEdit import DatabaseEdit
-from CDbNew import NewSection
+# from CDataEdit import DataEdit
+# from CDataNew import DataEdit
+from CDataEdit import DataEdit
+from CDataNew import DataNew
+from CDataView import DataView
 import logging
 
 # For MainWindow geneate :  pyuic5 -x  .\mainwindow.ui -o ..\..\source\CMainWindow.py
@@ -65,9 +68,9 @@ class GUI :
             self.fileName = QtWidgets.QFileDialog()
             opentFileName = self.fileName.getOpenFileName(self.fileName, "Open File", str(currentPath), "Database Files (*.db)")
             if str(opentFileName[0]) != "" :
-                self.database = Statistics(str(opentFileName[0]))
+                self.database = Word(str(opentFileName[0]))
                 self.plotDatabase()
-                self.createActionOnEdit(self.database.getRange())
+                self.createActionOnEdit(self.__databaseGetRange())
         else :
             logging.info("Database exist!")
 
@@ -94,22 +97,24 @@ class GUI :
         if self.database != "NULL" :
             sender = self.MainWindow.sender()
             lectureID = sender.objectName()
+            if lectureID != "ALL" :
+                logging.error("Obsolete!")
             if self.__active == self.ui.graphicWidget :
                 self.plotDatabaseClose()
-            if lectureID == "ALL" :
-                lectureID = 0
-            self.edit = DatabaseEdit(self.database, lectureID)
+            self.edit = DataEdit(self.database)
             self.MainWindow.setCentralWidget(self.edit.tabs)
             self.__setActive(self.edit)
-            self.edit.dataPresent()
 
     ## TODO: Check if object has an attribute first !
     #        AttributeError: 'GUI' object has no attribute 'edit' - fastest with boolean
     def saveChanges(self) :
-        if  self.__active == self.edit :            
-            self.database.updateRecords(self.__active.getEdited())
-        elif self.__active == self.new :
-            self.database.addRecords(self.__active.getEdited())
+        if issubclass(self.__active.__class__, DataView) :
+            _deleted = self.__active.getDeleted()
+            if len(_deleted) != 0 :
+                self.database.deleteRecords(_deleted)
+            else :
+                logging.warning("Nothing to delete!")
+            self.database.insertRecords(self.__active.getEdited())
         else :
             logging.warning("Nothing to be saved")
 
@@ -117,7 +122,8 @@ class GUI :
         if self.database != "NULL" :
             self.newLecture()
         else :
-            self.newDatabase()
+            # self.newDatabase()
+            self.newDatabaseTest()
 
     def newLecture(self) :
         if self.database != "NULL" :
@@ -135,6 +141,13 @@ class GUI :
             self.__setActive(self.new)
             self.new.tabs.show()
 
+    def newDatabaseTest(self) :
+        if self.__newDatabaseFile() :
+            self.new = DataView(self.database)
+            self.MainWindow.setCentralWidget(self.new.tabs)
+            self.__setActive(self.new)
+            self.new.tabs.show()
+
     def __newDatabaseFile(self) :
         if self.database != "NULL" :
             del self.database
@@ -144,9 +157,9 @@ class GUI :
         opentFileName = self.newFile.getSaveFileName(self.newFile, "Save File", "newDtabase", "Database Files (*.db)")
         if str(opentFileName[0]) != "" :
             logging.info("Created new file")
-            self.database = Statistics(str(opentFileName[0]))
+            self.database = Word(str(opentFileName[0]))
             self.plotDatabase()
-            self.createActionOnEdit(self.database.getRange())
+            self.createActionOnEdit(self.__databaseGetRange())
             return True
 
     def plotDatabase(self) :
@@ -156,10 +169,25 @@ class GUI :
         self.ui.graphicWidget.setTitle("Test Plot", color="w", size="8pt")
         self.ui.graphicWidget.setLabel('left', 'Origins', units='')
         self.ui.graphicWidget.setLabel('bottom', 'Weeks', units='')
-        self.ui.graphicWidget.plot(self.database.getRange(), self.database.showProgress())
+        self.ui.graphicWidget.plot(self.__databaseGetRange(), self.__databaseShowProgress())
+
+    def __databaseGetRange(self) :
+        weeks = list(range(0, (self.database.getLectureID() + 1)))
+        return weeks
+
+    def __databaseShowProgress(self) :
+        lectures = self.database.getLectureID()
+        progress = []
+        progress.append(0)
+        for lectureID in range(1, lectures + 1) :
+            if lectureID < 2 :
+                progress.append(self.database.getLectureProgress(lectureID))
+            else :
+                progress.append(self.database.getLectureProgress(lectureID) + progress[lectureID - 1])
+        return progress
 
     def plotDatabaseUpdate(self) :
-        self.ui.graphicWidget.plot(self.database.getRange(), self.database.showProgress())
+        self.ui.graphicWidget.plot(self.__databaseGetRange(), self.__databaseShowProgress())
 
     def plotDatabaseClose(self) :
         self.ui.graphicWidget.close()
@@ -170,7 +198,7 @@ class GUI :
         self.ui.graphicWidget.setTitle("Test Plot", color="w", size="8pt")
         self.ui.graphicWidget.setLabel('left', 'Origins', units='')
         self.ui.graphicWidget.setLabel('bottom', 'Weeks', units='')
-        bg1 = pg.BarGraphItem(x=self.database.getRange(), height=self.database.showProgress(), width=0.2, brush='g')
+        bg1 = pg.BarGraphItem(x=self.__databaseGetRange(), height=self.__databaseShowProgress(), width=0.2, brush='g')
         self.ui.graphicWidget.addItem(bg1)
 
     def importData(self) :
@@ -180,15 +208,19 @@ class GUI :
             currentPath = pathlib.Path().absolute()
             self.fileName = QtWidgets.QFileDialog()
             opentFileName = self.fileName.getOpenFileName(self.fileName, "Import File", str(currentPath), "CSV Files (*.csv)")
-            self.database.addProgress(str(opentFileName[0]))
-            self.plotDatabaseUpdate()
+            fileName = str(opentFileName[0])
+            if os.path.isfile(fileName):
+                self.database.importCSV(fileName)
+            else :
+                logging.warning("File " + str(fileName) + " does not exist!")
+            #self.plotDatabaseUpdate()
 
     def popupEdit(self) :
         if self.database == "NULL" : 
             logging.warning("Open database first!")
         else :
             self.listwidget = QListWidget()
-            for i in range(1, len(self.database.getRange())) :
+            for i in range(1, len(self.__databaseGetRange())) :
                 self.listwidget.insertItem(0, "Lecture " + str(i))
             self.listwidget.clicked.connect(self.clicked)
             self.listwidget.show()
