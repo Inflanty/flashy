@@ -13,6 +13,9 @@ class DataEdit(DataView) :
     def getDeleted(self) :
         return self.__editItemsDeleted
 
+    def pushClbk(self) :
+        pass
+
     def getNew(self) :
         pass
     

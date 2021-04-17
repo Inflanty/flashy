@@ -29,26 +29,38 @@ class DataView :
             logging.error("Database not exist")
         else :
             self.database = database
-            self.maxColumnWidth = 50
-            self.columnCount = len(self.viewHorHeaders)
-            self.rowsCount = self.database.getLastID()
-            if self.rowsCount == 0 :
-                self.table = QTableWidget(1, self.columnCount)
-            else :
-                self.table = QTableWidget(self.rowsCount, self.columnCount)
-            self.table.updatesEnabled()
-            self.tabs = QTabWidget()
-            self.tabs.addTab(self.table, "ALL")
-            self.shortcutsNewRow = QShortcut(QKeySequence('Ctrl+r'), self.tabs)
-            self.shortcutsNewRow.activated.connect(self.newRow)
-            self.shortcutsRmRow = QShortcut(QKeySequence('Ctrl+Del'), self.tabs)
-            self.shortcutsRmRow.activated.connect(self.rmRow)
-            self.table.setHorizontalHeaderLabels(self.viewHorHeaders)
-            self.push()
+            self.makeView()
 
     ## Class destructor
     def __del__(self) :
         self.table.clear()
+
+    # TODO : Check how much sections we have in db and create a tab for each of them
+    def makeView(self) :
+#        _lectures = self.database.getAllLectures()
+#        _lectureCounter = 0
+#        for lecture in _lectures :
+#            _lectureRowsCount = self.database.getLectureIDs(lecture)
+#            self.LecturesTable[_lectureCounter] = QTableWidget(_lectureRowsCount, self.columnCount)
+#            self.tabs.addTab(self.LecturesTable[_lectureCounter], "Lecture " + str(lecture))
+#            _lectureCounter = _lectureCounter + 1
+        self.maxColumnWidth = 50
+        self.columnCount = len(self.viewHorHeaders)
+        self.rowsCount = self.database.getLastID()
+        if self.rowsCount == 0 :
+            self.table = QTableWidget(1, self.columnCount)
+        else :
+            self.table = QTableWidget(self.rowsCount, self.columnCount)
+        self.table.updatesEnabled()
+        self.tabs = QTabWidget()
+        self.tabs.addTab(self.table, "ALL")
+        self.shortcutsNewRow = QShortcut(QKeySequence('Ctrl+r'), self.tabs)
+        self.shortcutsNewRow.activated.connect(self.newRow)
+        self.shortcutsRmRow = QShortcut(QKeySequence('Ctrl+Del'), self.tabs)
+        self.shortcutsRmRow.activated.connect(self.rmRow)
+        self.table.setHorizontalHeaderLabels(self.viewHorHeaders)
+        self.push()
+
 
     ## Data is push to tabs, ID column is hidden - can not be edited
     #  @brief This metod present the data in tabs
@@ -68,6 +80,12 @@ class DataView :
         self.table.cellChanged.connect(self.update)
         self.table.resizeColumnsToContents()
         self.table.resizeRowsToContents()
+        self.pushClbk()
+
+    ## Data is push to tabs Callback
+    #  @breief This method should be defined by subclass
+    def pushClbk(self) :
+        pass
 
     ## Data is pulled from view
     #  @breief This method should be defined by subclass

@@ -213,7 +213,7 @@ class GUI :
                 self.database.importCSV(fileName)
             else :
                 logging.warning("File " + str(fileName) + " does not exist!")
-            #self.plotDatabaseUpdate()
+            self.plotDatabaseUpdate()
 
     def popupEdit(self) :
         if self.database == "NULL" : 
