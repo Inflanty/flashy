@@ -7,36 +7,42 @@ from PyQt5.QtGui import QKeySequence
 import logging
 import re
 
-## DataView class to support database view
-#  @brief The class can pull data from database and push to View Window (see push)
-#         Class use database, directly from Word class from CWord, CStats is probably obsolete
-#  @param viewHorHeaders    - Horisontal header to be set in the window
-#  @param viewRowTemplate   - Template for a new row in Window
-#  @param itemsUpdated      - List with updated items
-#  @param itemsDeleted      - List with deleted items
 class DataView :
+    """ DataView class to support database view
+
+    The class can pull data from database and push to View Window (see push)
+    Class use database, directly from Word class from CWord, CStats is probably obsolete
+
+    viewHorHeaders    - Horisontal header to be set in the window
+    viewRowTemplate   - Template for a new row in Window
+    itemsUpdated      - List with updated items
+    itemsDeleted      - List with deleted items
+    """
     viewHorHeaders = ['ID', 'SECTION', 'WORD', 'TRANSLATION', 'CATEGORY', 'SENTENCE']
     viewRowTemplate = ['1', '', '', '', 'NULL', '']
     itemsUpdated = []
     itemsDeleted = []
-    ## DataView constructor
-    #  This class doues not support editing data lecture by lecture
-    #  TODO: Each lecture should be in separate tab
-    #  NOTE: This class use CWord directly, no need to use CStats
-    #  @param database name of the database to edit
+
     def __init__(self, database) :
+        """ DataView constructor
+
+        This class doues not support editing data lecture by lecture
+        TODO: Each lecture should be in separate tab
+        NOTE: This class use CWord directly, no need to use CStats
+        param database name of the database to edit
+        """
         if database == "NULL" or database == None :
             logging.error("Database not exist")
         else :
             self.database = database
             self.makeView()
 
-    ## Class destructor
     def __del__(self) :
+        """ Class destructor """
         pass
 
-    # TODO : Check how much sections we have in db and create a tab for each of them
     def makeView(self) :
+        """ TODO : Check how much sections we have in db and create a tab for each of them """
         self.maxColumnWidth = 50
         self.columnCount = len(self.viewHorHeaders)
         self.tabs = QTabWidget()
@@ -46,9 +52,11 @@ class DataView :
         self.shortcutsRmRow.activated.connect(self.rmRow)
         self.makeViewTabs()
 
-    ## Create new tab with empty tables
-    #  @brief Tab is created, deta is pushed to the tab
     def makeViewTabs(self) :
+        """Create new tab with empty tables
+
+        Tab is created, deta is pushed to the tab
+        """
         self.rowsCount = 1
         self.table = QTableWidget(self.rowsCount, self.columnCount)
         self.table.updatesEnabled()
@@ -58,10 +66,12 @@ class DataView :
         self.tabs.setCurrentIndex(QTabWidget.indexOf(self.tabs, self.table))
         self.tabs.currentChanged.connect(self.tabChanged)
 
-    ## Data is push to tabs, ID column is hidden - can not be edited
-    #  @brief This metod present the data in tabs.
-    #         If data not specified, the tamplate will be taken
     def push(self, data = []) :
+        """Data is push to tabs, ID column is hidden - can not be edited
+
+        This metod present the data in tabs.
+        If data not specified, the tamplate will be taken
+        """
         if not data :
             _dataRow = self.viewRowTemplate
             _dataRow[0] = self.database.getLastID() + 1
@@ -82,14 +92,17 @@ class DataView :
         self.table.resizeRowsToContents()
         self.pushClbk()
 
-    ## Data is push to tabs Callback
-    #  @breief This method should be defined by subclass
     def pushClbk(self) :
+        """ Data is push to tabs Callback
+        This method should be defined by subclass
+        """
         pass
 
-    ## Data is pulled from view
-    #  @breief This method should be defined by subclass
     def pull(self) :
+        """ Data is pulled from view
+
+        This method should be defined by subclass
+        """
         _rowContent = []
         for _row in range(self.table.rowCount()) :
             for _columns in range(self.columnCount) :
@@ -97,11 +110,13 @@ class DataView :
                 _rowContent.append(_singleitem)
             self.__updateMyItems(self.__mapViewToDbFormat(_rowContent))
 
-    ## If data is updated, the system needs to save the row of data
-    #  @brief This metod is a callback for item edit event
-    #         the edited datas row will be stored in itemsUpdated
-    #  TODO: If something in current vir=ew is changed, the name of a table should be updated with '*'
     def update(self) :
+        """ If data is updated, the system needs to save the row of data
+ 
+        This metod is a callback for item edit event
+        the edited datas row will be stored in itemsUpdated
+        TODO: If something in current vir=ew is changed, the name of a table should be updated with '*'
+        """
         _row = self.selectedRow()
         _rowContent = []
         for _columns in range (self.columnCount) :
@@ -110,10 +125,11 @@ class DataView :
         self.__updateMyItems(self.__mapViewToDbFormat(_rowContent))
         self.setTabTextUnsaved()
 
-
-    ## The Row can be addet to the data list, to be saved to database
-    #  @brief Such data as ID, SectioID and category is copiet to the new row
     def newRow(self) :
+        """ The Row can be addet to the data list, to be saved to database
+
+        Such data as ID, SectioID and category is copiet to the new row
+        """
         _row = self.table.rowCount()
         originID = ""
         #originID = str(int(self.table.item(_row - 1, 0).text()) + 1)
@@ -136,13 +152,15 @@ class DataView :
             self.itemsDeleted.remove(originID)
         self.newRowClbk()
 
-    ## Callback
-    #  @breief This method should be defined by subclass 
     def newRowClbk(self) :
+        """ Callback
+
+        This method should be defined by subclass 
+        """
         pass
 
-    ## Remove row from view and store deleted ID
     def rmRow(self) :
+        """ Remove row from view and store deleted ID """
         _row = self.selectedRow()
         _singleitem = self.table.item(_row, 0).text()
         if _singleitem not in self.itemsDeleted :
@@ -152,29 +170,34 @@ class DataView :
         else :
             logging.info('Select row to delete!')
 
-    ## Selected row can be detected
-    #  @return Selected row
     def selectedRow(self):
+        """ Selected row can be detected
+        Return selected row
+        """
         if self.table.selectionModel().selectedIndexes() != [] :
             row = self.table.selectionModel().selectedIndexes()[0].row()
         else :
             row = 0
         return int(row)
 
-    ## Selected column can be detected
-    #  @return Selected column
     def selectedColumn(self):
+        """ Selected column can be detected
+
+        Return selected column
+        """
         if self.table.selectionModel().selectedIndexes() != [] :
             column = self.table.selectionModel().selectedIndexes()[0].column()
         else :
             column = 0
         return int(column)
 
-    ## Updated row should be saved in itemsUpdated list
-    #  @breif If particular ID already exist, it has to be updated in the same place
-    #  @param rowOfItems - Row of items to be updated
-    #  @return None if position exist
     def __updateMyItems(self, rowOfItems) :
+        """  Updated row should be saved in itemsUpdated list
+        
+        If particular ID already exist, it has to be updated in the same place
+        rowOfItems - Row of items to be updated
+        Return None if position exist
+        """
         _len = len(self.itemsUpdated)
         if _len > 0 :
             for _singleRow in range(_len) :
@@ -183,32 +206,38 @@ class DataView :
                     return
         self.itemsUpdated.append(rowOfItems)
 
-    ## Single row should contain data to be saved
-    #  @brief Check if there is a data in the row
-    #  @param row - Row to be checked
-    #  @return True if row is edited
     def __checkIfEdited(self, row) :
+        """ Single row should contain data to be saved
+        
+        Check if there is a data in the row
+        row - Row to be checked
+        Return True if row is edited
+        """
         for _item in row :
             if re.match("^(?![\s\S])", _item) == None :
                 return True
         return False
 
-    ## Data format could be different between DB and View
-    #  @brief mapp data in row to DB format
-    #  @param row - Single row with data to be mapped
-    #  @return mapped row
     def __mapViewToDbFormat(self, row) :
+        """ Data format could be different between DB and View
+
+        mapp data in row to DB format
+        row - Single row with data to be mapped
+        Return mapped row
+        """
         _columnMap = [0, 1, 2, 5, 3, 4]
         _rowMapped = []
         for _item in range(self.columnCount) :
             _rowMapped.append(row[_columnMap[_item]])
         return _rowMapped
 
-    ## Data format could be different between DB and View
-    #  @brief mapp data from DB to view format
-    #  @param row - Single row with data to be mapped
-    #  @return mapped row
     def __mapDbToViewFormat(self, row) :
+        """ Data format could be different between DB and View
+ 
+        mapp data from DB to view format
+        row - Single row with data to be mapped
+        Return mapped row
+        """
         _columnMap = [0, 1, 2, 4, 5, 3]
         _rowMapped = []
         for _item in range(self.columnCount) :
@@ -216,10 +245,15 @@ class DataView :
         return _rowMapped
 
     def tabChanged(self, index) :
+        """ Keep track og current tabs and table
+
+        index - take the index of current tab 
+        """
         self.tabs.setCurrentIndex(index)
         self.table = self.tabs.currentWidget()
 
     def setTabTextUnsaved(self) :
+        """ Tab name should be changed if contains unsaved changes """
         _index = self.tabs.currentIndex()
         _text = self.tabs.tabText(_index)
         if "*" not in _text :
@@ -227,6 +261,7 @@ class DataView :
             self.tabs.tabBar().setTabTextColor(_index, Qt.red)
 
     def setTabTextSaved(self) :
+        """ Tab name should be as default if changes were saved """
         for index in range(self.tabs.count()) :
             _text = self.tabs.tabText(index)
             if "*" in _text :

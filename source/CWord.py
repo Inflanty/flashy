@@ -18,8 +18,10 @@ import logging
 #
 #  Word class provide all neccessary functionalities for this module
 class Word:
-    ## Word constructor
-    #  @param Name of the database to connect/create
+    """ Word constructor
+
+    name - name of the database to connect/create
+    """
     def __init__(self, name) :
         self.name = "NONE"
         if name == 'mem' :
@@ -34,14 +36,15 @@ class Word:
         self.cursorDB = self.connDB.cursor()
         self.initDB()
     
-    ## Word destructor
     def __del__(self) :
+        """ Word destructor """
         self.closeConnection()
 
-    ## Database init
-    #  @brief This method creates database if not exist,
-    #         else, just pass.
     def initDB(self) :
+        """ Database init
+
+        This method creates database if not exist, else - just pass.
+        """
         try :
             self.cursorDB.execute("""CREATE TABLE """ + self.tableName + """ (
                 originID integer,
@@ -58,21 +61,21 @@ class Word:
         except sqlite3.DatabaseError:
             logging.warning("File is not a database")
 
-    ## Get column names from database
-    #  @return list with columns name
     def getColumnNames(self) :
-        #self.cursorDB.execute("SELECT * FROM record")
-        #colnames = self.cursorDB.description
-        #for row in colnames:
-            # names.append(row[0])
+        """ Get column names from database
+
+        Return list with columns name
+        """
         names = ["ID", "LECTURE", "ORIGIN", "SENTENCE", "TRANSLATION", "CATEGORY", "Diki LINK"]
         return names
 
-    ## Get last lecture, could be use for all lectures counting
-    #  @return Last kecture ID
-    #  TODO: This will return last lecture ID only when we have an increasing order in the db,
-    #        We don't want to limit ourselfes to keep the order
     def getLectureID(self) :
+        """ Get last lecture, could be use for all lectures counting
+        
+        Return Last kecture ID
+        TODO: This will return last lecture ID only when we have an increasing order in the db,
+              We don't want to limit ourselfes to keep the order
+        """
         with self.connDB:
             try:
                 self.cursorDB.execute("SELECT lectureID FROM " + self.tableName + " ORDER BY lectureID DESC LIMIT 1")
@@ -82,10 +85,12 @@ class Word:
                 lectureID = 0
         return lectureID
 
-    ## Get all origins from lecture
-    #  @param lectureID
-    #  @return number of origins
     def getLectureProgress(self, lectureID) :
+        """ Get all origins from lecture
+        
+        lectureID - ID of corresponding lecture
+        Return number of origins
+        """
         try:
             self.cursorDB.execute("SELECT originID FROM " + self.tableName + " WHERE lectureID = '" + str(lectureID) + "'")
             originList = self.cursorDB.fetchall()
@@ -94,9 +99,11 @@ class Word:
             total_length = 0
         return total_length
 
-    ## Get last recorded ID from database
-    #  @return The highest ID from database
     def getLastID(self) :
+        """ Get last recorded ID from database
+        
+        Return The highest ID from database
+        """
         try:
             self.cursorDB.execute("SELECT originID FROM " + self.tableName + " ORDER BY originID DESC LIMIT 1")
             lastID = self.cursorDB.fetchall()[0][0]
@@ -104,10 +111,12 @@ class Word:
             lastID = 0
         return lastID
 
-    ## Get ID of particular origin
-    #  @param origin
-    #  @return ID of provided origin
     def getOriginID(self, origin) :
+        """ Get ID of particular origin
+
+        origin - The word for ID will be returned
+        Return ID of provided origin
+        """
         try:
             self.cursorDB.execute("SELECT originID FROM " + self.tableName + " WHERE origin = '" + str(origin) + "'")
             ID = self.cursorDB.fetchall()[0][0]
@@ -115,10 +124,12 @@ class Word:
             ID = 0
         return ID
 
-    ## Get origin of specified ID
-    #  @param ID originID
-    #  @return origin
     def getOriginByID(self, ID) :
+        """ Get origin of specified ID
+        
+        ID - originID
+        Return origin
+        """
         try:
             self.cursorDB.execute("SELECT origin FROM " + self.tableName + " WHERE originID = " + str(ID))
             origin = self.cursorDB.fetchall()[0][0]
@@ -126,18 +137,12 @@ class Word:
             origin = 'N/A'
         return origin
 
-    def getTransByID(self, ID) :
-        try:
-            self.cursorDB.execute("SELECT trans FROM " + self.tableName + " WHERE originID = " + str(ID))
-            trans = self.cursorDB.fetchall()[0][0]
-        except IndexError:
-            trans = 'N/A'
-        return trans  
-
-    ## Get origin of specified ID
-    #  @param ID originID
-    #  @return sentence
     def getSentenceByID(self, ID) :
+        """ Get origin of specified ID
+        
+        ID - originID
+        Return sentence
+        """
         try:
             self.cursorDB.execute("SELECT sentence FROM " + self.tableName + " WHERE originID = " + str(ID))
             sentence = self.cursorDB.fetchall()[0][0]
@@ -145,10 +150,12 @@ class Word:
             sentence = 'N/A'
         return sentence
 
-    ## Get IDs of specified lecture
-    #  @param lectureID
-    #  @return IDs list
     def getLectureIDs(self, lectureID) :
+        """ Get IDs of specified lecture
+        
+        lectureID - ID of the corresponding lecture
+        Return IDs list
+        """
         listIDs = []
         try:
             self.cursorDB.execute("SELECT originID FROM " + self.tableName + " WHERE lectureID = " + str(lectureID))
@@ -161,9 +168,11 @@ class Word:
             listIDs = 'N/A'
         return listIDs
 
-    ## Get IDs of database
-    #  @return IDs list
     def getAllIDs(self) :
+        """ Get IDs of database
+    
+        Return IDs list
+        """
         try:
             self.cursorDB.execute("SELECT originID FROM " + self.tableName)
             IDs = self.cursorDB.fetchall()
@@ -171,9 +180,11 @@ class Word:
             IDs = 0
         return IDs
 
-    ## Get lectures of database
-    #  @return IDs list
     def getAllLectures(self) :
+        """ Get lectures of database
+        
+        Return IDs list
+        """
         try:
             self.cursorDB.execute("SELECT lectureID FROM " + self.tableName)
             IDs = self.cursorDB.fetchall()
@@ -184,16 +195,18 @@ class Word:
             lectures = [0]
         return lectures
 
-    ## Add single row to database from CSV file
-    #  @param row to add
-    #         row format :
-    #         [0] Lecture ID
-    #         [1] Lecture ID
-    #         [2] Origin
-    #         [3] Sentence contains origin
-    #         [4] Traslation of origin
-    #         [5] Origin category
     def addRecordFromCSV(self, row) :
+        """ Add single row to database from CSV file
+        
+        row - row to add
+        row format :
+        [0] Lecture ID
+        [1] Lecture ID
+        [2] Origin
+        [3] Sentence contains origin
+        [4] Traslation of origin
+        [5] Origin category
+        """
         if self.__checkRecord(row):
             newID = self.getLastID() + 1
             if row[4] == "NULL" :
@@ -211,15 +224,17 @@ class Word:
                         'dikiLink' :    link})
                 logging.warning('Added record : ' + str(newID))
 
-    ## Add single row to database
-    #  @param row to add
-    #         row format :
-    #         [0] Lecture ID
-    #         [1] Origin
-    #         [2] Sentence contains origin
-    #         [3] Traslation of origin
-    #         [4] Origin category
     def addRecord(self, row) :
+        """ Add single row to database
+
+        row - row to add
+        row format :
+        [0] Lecture ID
+        [1] Origin
+        [2] Sentence contains origin
+        [3] Traslation of origin
+        [4] Origin category
+        """
         if self.__checkRecord(row):
             if row[4] == "NULL" :
                 link = "https://www.diki.pl/slownik-angielskiego?q=" + str(row[1].lower()).replace(" ", "+")
@@ -236,17 +251,19 @@ class Word:
                         'dikiLink' :    link})
                 logging.warning('Added record : ' + str(row[0]))
 
-    ## The record can be inserted to the db
-    #  @breif update and adding new record should be accessible from this point
-    #  @param row to add
-    #         row format :
-    #         [0] Record ID
-    #         [1] Lecture ID
-    #         [2] Origin
-    #         [3] Sentence contains origin
-    #         [4] Traslation of origin
-    #         [5] Origin category
     def insertRecord(self, row) :
+        """  The record can be inserted to the db
+
+        update and adding new record should be accessible from this point
+        row - row to add
+        row format :
+        [0] Record ID
+        [1] Lecture ID
+        [2] Origin
+        [3] Sentence contains origin
+        [4] Traslation of origin
+        [5] Origin category
+        """
         if row[0] == "" :
             # New element
             row[0] = str(self.getLastID() + 1)
@@ -255,10 +272,12 @@ class Word:
             # Updated
             self.updateRow(row)
 
-    ## The records can be inserted as a list
-    #  @brief Iterate through the list and parse row further
-    #  @param data - list with rows    
     def insertRecords(self, data) :
+        """ The records can be inserted as a list
+        
+        Iterate through the list and parse row further
+        data - list with rows
+        """
         for row in data :
             logging.debug("Row format :\n\t" + row[0] + 
                       "\n\t" + row[1] + 
@@ -268,10 +287,12 @@ class Word:
                       "\n\t" + row[5])
             self.insertRecord(row)
 
-    ## The records can be inserted as a list
-    #  @brief Iterate through the list and parse the ID further
-    #  @param data - list with IDs to delete 
     def deleteRecords(self, data) :
+        """ The records can be inserted as a list
+ 
+        Iterate through the list and parse the ID further
+        data - list with IDs to delete 
+        """
         lastID = self.getLastID()
         for index in range(len(data)) :
             if int(data[index]) > int(lastID) :
@@ -279,9 +300,11 @@ class Word:
             else :
                 self.deleteRecord(data[index])
 
-    ## Delete record from database
-    #  @param ID of record to delete
     def deleteRecord(self, ID) :
+        """ Delete record from database
+
+        ID - ID of record to delete
+        """
         if ID != 0 :
             with self.connDB:
                 try :
@@ -293,10 +316,12 @@ class Word:
         else :
             logging.error('Error! Row format : [lectureID, origin, sentence, trans, category]')
 
-    ## Data could be deleted in the middle, the ID should be updated
-    #  @brief Update EVERY ID after given one to value 'ID - 1'
-    #  @param oldID - ID to start with refresh
     def __refreshIDs(self, oldID) :
+        """ Data could be deleted in the middle, the ID should be updated
+        
+        Update EVERY ID after given one to value 'ID - 1'
+        oldID - ID to start with refresh
+        """
         _lastID = self.getLastID() - 1 
         if oldID != _lastID :
             with self.connDB:
@@ -309,10 +334,12 @@ class Word:
                 except IndexError:
                     logging.error("IndexError")
 
-    ## Import CSV file to database
-    #  @param filename
-    #  Note that file format has to follow row format from addRecordFromCSV (use comma as a delimiter) 
     def importCSV(self, filename) :
+        """ Import CSV file to database
+        
+        filename - CSV file name to be imported
+        Note that file format has to follow row format from addRecordFromCSV (use comma as a delimiter) 
+        """
         tic = time.perf_counter()
         with open(filename, newline='', encoding='utf-8') as f:
             reader = csv.reader(f)
@@ -325,31 +352,30 @@ class Word:
         toc = time.perf_counter()
         logging.info(f"Imported CSV file in {toc - tic:0.4f} seconds")
 
-    ## Export row to CSV file
-    #  @param lectureID
-    #  @param row
-    #  The row has to be in right format here
-    def exportCSV(self) :
-        CSVReader.run()
-
-    ## Add section, format of data should be same as for addRecord()
-    #  @param data - data to be added
     def addSection(self, data) :
+        """ Add section, format of data should be same as for addRecord()
+
+        data - data to be added
+        """
         for _row in data :
            self.addRecord(_row)
            logging.info("Added row : " + str(_row))       
 
-    ## Edit section in database
-    #  @param data - entire and edited lectures data
     def updateSection(self, data) :
+        """ Edit section in database
+        
+        data - entire and edited lectures data
+        """
         for _row in data :
             if self.updateRow(_row) :
                 logging.info("Updated row : " + str(_row))
 
-    ## Edit row in database
-    #  @param row - row data (list)
-    #  The row has to be in right format here
     def updateRow(self, row) :
+        """ Edit row in database
+
+        row - row data (list)
+        The row has to be in right format here
+        """
         if self.__checkRecord(row):
             with self.connDB:
                 try:
@@ -366,40 +392,46 @@ class Word:
                     logging.error("IndexError")
         return False
 
-    ## Get single row
-    #  @param rowNumber - Number of row to be returned
     def getRow(self, rowNumber) :
+        """ Get single row
+    
+        rowNumber - Number of row to be returned
+        """
         self.cursorDB.execute("SELECT * FROM " + self.tableName + " WHERE originID = " + str(rowNumber))
         return self.cursorDB.fetchall()
 
-    ## Get rows from lecture
-    #  @param lectureID - ID of Lecture containing the data to be returned
-    #  NOTE: If not specified, return data from entire database
     def getRows(self, lectureID = 0) :
+        """ Get rows from lecture
+        
+        lectureID - ID of Lecture containing the data to be returned
+        NOTE: If not specified, return data from entire database
+        """
         elements = ""
         if (lectureID != 0) :
             elements = " WHERE lectureID = " + str(lectureID)
         self.cursorDB.execute("SELECT * FROM " + self.tableName + elements)
         return self.cursorDB.fetchall()
 
-    ## Present entire Database
     def present(self) :
+        """ Present entire Database """
         self.cursorDB.execute("SELECT * FROM " + self.tableName)
         table = self.cursorDB.fetchall()
         return table
 
-    ## Close connection to database
     def closeConnection(self) :
+        """ Close connection to database """
         try :
             self.connDB.close()
             logging.info('Connection to ' + self.name + ' closed!')
         except AttributeError:
             pass
 
-    ## The recors has to be check formatwise,
-    #  before we can add it to the database
-    #  @param row to check
     def __checkRecord(self, row) :
+        """ The recors has to be check formatwise,
+        
+        before we can add it to the database
+        row - row to check
+        """
         if len(row) == 6:
             if  row[0].isdigit() and \
                 row[1].isdigit() and \
