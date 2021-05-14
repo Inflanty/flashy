@@ -11,14 +11,14 @@ from CMainWindow import Ui_MainWindow
 from CFileBrowser import Ui_FileBrowser
 from CWord import Word
 from CSVReader import MyWindow
-# from CDataEdit import DataEdit
-# from CDataNew import DataEdit
 from CDataEdit import DataEdit
 from CDataNew import DataNew
 from CDataView import DataView
 import logging
 
 # For MainWindow geneate :  pyuic5 -x  .\mainwindow.ui -o ..\..\source\CMainWindow.py
+
+# TODO: If something is not saved, there should be popup window if the user wants to save latest chenges !
 
 class GUI :
     database = "NULL"
@@ -61,6 +61,7 @@ class GUI :
         self.ui.actionNew.triggered.connect(lambda: self.createNew())
         self.ui.actionSave.triggered.connect(lambda: self.saveChanges())
         self.ui.actionVersion.triggered.connect(lambda: self.popupHelp())
+        self.ui.actionEdit.triggered.connect(lambda: self.dbEdit())
 
     def fileNameOpen(self) :
         if self.database == "NULL" :   
@@ -70,80 +71,51 @@ class GUI :
             if str(opentFileName[0]) != "" :
                 self.database = Word(str(opentFileName[0]))
                 self.plotDatabase()
-                self.createActionOnEdit(self.__databaseGetRange())
         else :
             logging.info("Database exist!")
 
-    def createActionOnEdit(self, lectureList) :
-        # First edit existing action
-        self.ui.name = []
-        self.ui.name.append(self.ui.action)
-        self.ui.name[0] = self.ui.action
-        # Edit ALL
-        self.ui.name[0].setObjectName("ALL")
-        self.ui.menuEdit.addAction(self.ui.name[0])
-        self.ui.name[0].setText(QtCore.QCoreApplication.translate("MainWindow", "ALL"))
-        self.ui.name[0].triggered.connect(self.dbEdit)
-        # Lectures edit
-        if len(lectureList) != 1 :
-            for i in range(1, len(lectureList) + 1) :
-                self.ui.name.append(QtWidgets.QAction(self.MainWindow))
-                self.ui.name[i].setObjectName("Lecture " + str(i))
-                self.ui.menuEdit.addAction(self.ui.name[i - 1])
-                self.ui.name[i].setText(QtCore.QCoreApplication.translate("MainWindow", "Lecture " + str(i)))
-                self.ui.name[i].triggered.connect(self.dbEdit)
-
     def dbEdit(self) :
         if self.database != "NULL" :
-            sender = self.MainWindow.sender()
-            lectureID = sender.objectName()
-            if lectureID != "ALL" :
-                logging.error("Obsolete!")
             if self.__active == self.ui.graphicWidget :
                 self.plotDatabaseClose()
             self.edit = DataEdit(self.database)
             self.MainWindow.setCentralWidget(self.edit.tabs)
             self.__setActive(self.edit)
 
-    ## TODO: Check if object has an attribute first !
-    #        AttributeError: 'GUI' object has no attribute 'edit' - fastest with boolean
     def saveChanges(self) :
         if issubclass(self.__active.__class__, DataView) :
             _deleted = self.__active.getDeleted()
             if len(_deleted) != 0 :
                 self.database.deleteRecords(_deleted)
             else :
-                logging.warning("Nothing to delete!")
+                logging.info("Nothing to delete!")
             self.database.insertRecords(self.__active.getEdited())
         else :
-            logging.warning("Nothing to be saved")
+            logging.info("Nothing to be saved")
 
     def createNew(self) :
+        if self.__active == self.ui.graphicWidget :
+            self.plotDatabaseClose()
         if self.database != "NULL" :
             self.newLecture()
         else :
-            # self.newDatabase()
-            self.newDatabaseTest()
+            self.newDatabase()
 
     def newLecture(self) :
+        if self.__active == self.edit :
+            self.edit.addLecture()
+
+    def newLecture_obsolete(self) :
         if self.database != "NULL" :
-            if self.__active == self.ui.graphicWidget :
-                self.plotDatabaseClose()
             self.new = NewSection()
             self.MainWindow.setCentralWidget(self.new.tabs)
             self.__setActive(self.new)
             self.new.tabs.show()
 
     def newDatabase(self) :
+        logging.debug("New database!")
         if self.__newDatabaseFile() :
-            self.new = NewSection()
-            self.MainWindow.setCentralWidget(self.new.tabs)
-            self.__setActive(self.new)
-            self.new.tabs.show()
-
-    def newDatabaseTest(self) :
-        if self.__newDatabaseFile() :
-            self.new = DataView(self.database)
+            self.new = DataNew(self.database)
             self.MainWindow.setCentralWidget(self.new.tabs)
             self.__setActive(self.new)
             self.new.tabs.show()
@@ -158,8 +130,6 @@ class GUI :
         if str(opentFileName[0]) != "" :
             logging.info("Created new file")
             self.database = Word(str(opentFileName[0]))
-            self.plotDatabase()
-            self.createActionOnEdit(self.__databaseGetRange())
             return True
 
     def plotDatabase(self) :

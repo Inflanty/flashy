@@ -178,12 +178,38 @@ class Word:
             self.cursorDB.execute("SELECT lectureID FROM " + self.tableName)
             IDs = self.cursorDB.fetchall()
             lectures = []
-            for lecture in range(len(IDs)) :
-                if lecture not in lectures :
-                   lectures.append(lecture)
+            for row in IDs :
+                lectures.append(row[0]) if row[0] not in lectures else lectures
         except IndexError:
             lectures = [0]
         return lectures
+
+    ## Add single row to database from CSV file
+    #  @param row to add
+    #         row format :
+    #         [0] Lecture ID
+    #         [1] Lecture ID
+    #         [2] Origin
+    #         [3] Sentence contains origin
+    #         [4] Traslation of origin
+    #         [5] Origin category
+    def addRecordFromCSV(self, row) :
+        if self.__checkRecord(row):
+            newID = self.getLastID() + 1
+            if row[4] == "NULL" :
+                link = "https://www.diki.pl/slownik-angielskiego?q=" + str(row[1].lower()).replace(" ", "+")
+            else :
+                link = "NULL"
+            with self.connDB:
+                self.cursorDB.execute("INSERT INTO " + self.tableName + " VALUES (:originID, :lectureID, :origin, :sentence, :trans, :category, :dikiLink)",
+                        {'originID' :   newID,
+                        'lectureID' :   row[0],
+                        'origin'  :     row[1],
+                        'sentence'  :   row[2],
+                        'trans'  :      row[3],
+                        'category'  :   row[4],
+                        'dikiLink' :    link})
+                logging.warning('Added record : ' + str(newID))
 
     ## Add single row to database
     #  @param row to add
@@ -195,23 +221,20 @@ class Word:
     #         [4] Origin category
     def addRecord(self, row) :
         if self.__checkRecord(row):
-            newID = self.getLastID() + 1
-            if newID != row[0] :
-                logging.warning("Element has wrong ID : " + row[0])
             if row[4] == "NULL" :
                 link = "https://www.diki.pl/slownik-angielskiego?q=" + str(row[1].lower()).replace(" ", "+")
             else :
                 link = "NULL"
             with self.connDB:
                 self.cursorDB.execute("INSERT INTO " + self.tableName + " VALUES (:originID, :lectureID, :origin, :sentence, :trans, :category, :dikiLink)",
-                        {'originID' : newID,
-                        'lectureID' : row[1],
-                        'origin'  :  row[2],
-                        'sentence'  : row[3],
-                        'trans'  : row[4],
-                        'category'  : row[5],
-                        'dikiLink' : link})
-                logging.warning('Added record : ' + newID)
+                        {'originID' :   row[0],
+                        'lectureID' :   row[1],
+                        'origin'  :     row[2],
+                        'sentence'  :   row[3],
+                        'trans'  :      row[4],
+                        'category'  :   row[5],
+                        'dikiLink' :    link})
+                logging.warning('Added record : ' + str(row[0]))
 
     ## The record can be inserted to the db
     #  @breif update and adding new record should be accessible from this point
@@ -224,9 +247,9 @@ class Word:
     #         [4] Traslation of origin
     #         [5] Origin category
     def insertRecord(self, row) :
-        newID = self.getLastID()
-        if newID < int(row[0]) :
+        if row[0] == "" :
             # New element
+            row[0] = str(self.getLastID() + 1)
             self.addRecord(row)
         else :
             # Updated
@@ -251,7 +274,7 @@ class Word:
     def deleteRecords(self, data) :
         lastID = self.getLastID()
         for index in range(len(data)) :
-            if data[index] > lastID :
+            if int(data[index]) > int(lastID) :
                 logging.debug("Nothing to delete")
             else :
                 self.deleteRecord(data[index])
@@ -288,7 +311,7 @@ class Word:
 
     ## Import CSV file to database
     #  @param filename
-    #  Note that file format has to follow row format from addRecord (use comma as a delimiter) 
+    #  Note that file format has to follow row format from addRecordFromCSV (use comma as a delimiter) 
     def importCSV(self, filename) :
         tic = time.perf_counter()
         with open(filename, newline='', encoding='utf-8') as f:
@@ -296,7 +319,7 @@ class Word:
             for row in reader:
                 ID = self.getOriginID(row[1])
                 if ID == 0 :
-                    self.addRecord(row)
+                    self.addRecordFromCSV(row)
                 else :
                     logging.warning(row[1] + " exist on position " + str(ID))
         toc = time.perf_counter()
@@ -377,7 +400,7 @@ class Word:
     #  before we can add it to the database
     #  @param row to check
     def __checkRecord(self, row) :
-        if (len(row) == 6) and not ("#" in row[0]):
+        if len(row) == 6:
             if  row[0].isdigit() and \
                 row[1].isdigit() and \
                 not any(map(str.isdigit, row[2])) and \

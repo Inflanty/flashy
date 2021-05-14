@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file '.\mainwindow.ui'
+# Form implementation generated from reading ui file '..\resources\ui\mainwindow.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.2
 #
@@ -32,8 +32,6 @@ class Ui_MainWindow(object):
         self.menuOpen.setObjectName("menuOpen")
         self.menuImport = QtWidgets.QMenu(self.menuFile)
         self.menuImport.setObjectName("menuImport")
-        self.menuEdit = QtWidgets.QMenu(self.menuFile)
-        self.menuEdit.setObjectName("menuEdit")
         self.menuHelp = QtWidgets.QMenu(self.menubar)
         self.menuHelp.setObjectName("menuHelp")
         MainWindow.setMenuBar(self.menubar)
@@ -56,13 +54,14 @@ class Ui_MainWindow(object):
         self.action.setObjectName("action")
         self.actionSave = QtWidgets.QAction(MainWindow)
         self.actionSave.setObjectName("actionSave")
+        self.actionEdit = QtWidgets.QAction(MainWindow)
+        self.actionEdit.setObjectName("actionEdit")
         self.menuOpen.addAction(self.actiondatabase)
         self.menuImport.addAction(self.actionCSV_File)
-        self.menuEdit.addAction(self.action)
         self.menuFile.addAction(self.actionNew)
         self.menuFile.addAction(self.menuOpen.menuAction())
+        self.menuFile.addAction(self.actionEdit)
         self.menuFile.addAction(self.actionSave)
-        self.menuFile.addAction(self.menuEdit.menuAction())
         self.menuFile.addAction(self.menuImport.menuAction())
         self.menuFile.addSeparator()
         self.menuFile.addAction(self.actionExit)
@@ -82,7 +81,6 @@ class Ui_MainWindow(object):
         self.menuOpen.setTitle(_translate("MainWindow", "Open"))
         self.menuImport.setStatusTip(_translate("MainWindow", "Import a file"))
         self.menuImport.setTitle(_translate("MainWindow", "Import"))
-        self.menuEdit.setTitle(_translate("MainWindow", "Edit"))
         self.menuHelp.setTitle(_translate("MainWindow", "Help"))
         self.actionExit.setText(_translate("MainWindow", "Exit"))
         self.actionVersion.setText(_translate("MainWindow", "Version"))
@@ -98,6 +96,8 @@ class Ui_MainWindow(object):
         self.actionNew.setShortcut(_translate("MainWindow", "Ctrl+N"))
         self.actionSave.setText(_translate("MainWindow", "Save"))
         self.actionSave.setShortcut(_translate("MainWindow", "Ctrl+S"))
+        self.actionEdit.setText(_translate("MainWindow", "Edit"))
+        self.actionEdit.setShortcut(_translate("MainWindow", "Ctrl+E"))
 
 
 if __name__ == "__main__":

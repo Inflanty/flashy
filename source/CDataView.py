@@ -1,6 +1,6 @@
 # CDataView.py
 
-from PyQt5.QtCore import QObject, pyqtSignal
+from PyQt5.QtCore import QObject, pyqtSignal, Qt
 from PyQt5.QtWidgets import QTabWidget, QTableWidget, QTableWidgetItem, QShortcut
 from PyQt5.QtGui import QKeySequence
 
@@ -33,48 +33,48 @@ class DataView :
 
     ## Class destructor
     def __del__(self) :
-        self.table.clear()
+        pass
 
     # TODO : Check how much sections we have in db and create a tab for each of them
     def makeView(self) :
-#        _lectures = self.database.getAllLectures()
-#        _lectureCounter = 0
-#        for lecture in _lectures :
-#            _lectureRowsCount = self.database.getLectureIDs(lecture)
-#            self.LecturesTable[_lectureCounter] = QTableWidget(_lectureRowsCount, self.columnCount)
-#            self.tabs.addTab(self.LecturesTable[_lectureCounter], "Lecture " + str(lecture))
-#            _lectureCounter = _lectureCounter + 1
         self.maxColumnWidth = 50
         self.columnCount = len(self.viewHorHeaders)
-        self.rowsCount = self.database.getLastID()
-        if self.rowsCount == 0 :
-            self.table = QTableWidget(1, self.columnCount)
-        else :
-            self.table = QTableWidget(self.rowsCount, self.columnCount)
-        self.table.updatesEnabled()
         self.tabs = QTabWidget()
-        self.tabs.addTab(self.table, "ALL")
         self.shortcutsNewRow = QShortcut(QKeySequence('Ctrl+r'), self.tabs)
         self.shortcutsNewRow.activated.connect(self.newRow)
         self.shortcutsRmRow = QShortcut(QKeySequence('Ctrl+Del'), self.tabs)
         self.shortcutsRmRow.activated.connect(self.rmRow)
+        self.makeViewTabs()
+
+    ## Create new tab with empty tables
+    #  @brief Tab is created, deta is pushed to the tab
+    def makeViewTabs(self) :
+        self.rowsCount = 1
+        self.table = QTableWidget(self.rowsCount, self.columnCount)
+        self.table.updatesEnabled()
         self.table.setHorizontalHeaderLabels(self.viewHorHeaders)
         self.push()
-
+        self.tabs.addTab(self.table, "New")
+        self.tabs.setCurrentIndex(QTabWidget.indexOf(self.tabs, self.table))
+        self.tabs.currentChanged.connect(self.tabChanged)
 
     ## Data is push to tabs, ID column is hidden - can not be edited
-    #  @brief This metod present the data in tabs
-    def push(self) :
-        _dataLen = self.database.getLastID()
-        _dataRows = self.database.getRows()
-        for _rows in range(_dataLen) :
-            if _dataLen == 0 :
-                _dataRow = self.viewRowTemplate
-            else :
-                _dataRow = self.__mapDbToViewFormat(_dataRows[_rows])
+    #  @brief This metod present the data in tabs.
+    #         If data not specified, the tamplate will be taken
+    def push(self, data = []) :
+        if not data :
+            _dataRow = self.viewRowTemplate
+            _dataRow[0] = self.database.getLastID() + 1
             for _columns in range(self.columnCount) :
                 newitem = QTableWidgetItem(_dataRow[_columns])
-                self.table.setItem(_rows, _columns, newitem)
+                self.table.setItem(0, _columns, newitem)
+        else :
+            _dataLen = len(data)
+            for _rows in range(_dataLen) :
+                _dataRow = self.__mapDbToViewFormat(data[_rows])
+                for _columns in range(self.columnCount) :
+                    newitem = QTableWidgetItem(_dataRow[_columns])
+                    self.table.setItem(_rows, _columns, newitem)
         self.table.hideColumn(0)
         self.table.horizontalHeader().setStretchLastSection(True)
         self.table.cellChanged.connect(self.update)
@@ -90,25 +90,33 @@ class DataView :
     ## Data is pulled from view
     #  @breief This method should be defined by subclass
     def pull(self) :
-        pass
+        _rowContent = []
+        for _row in range(self.table.rowCount()) :
+            for _columns in range(self.columnCount) :
+                _singleitem = self.table.item(_row, _columns).text()
+                _rowContent.append(_singleitem)
+            self.__updateMyItems(self.__mapViewToDbFormat(_rowContent))
 
     ## If data is updated, the system needs to save the row of data
     #  @brief This metod is a callback for item edit event
     #         the edited datas row will be stored in itemsUpdated
+    #  TODO: If something in current vir=ew is changed, the name of a table should be updated with '*'
     def update(self) :
         _row = self.selectedRow()
-        logging.warning(_row)
         _rowContent = []
         for _columns in range (self.columnCount) :
             _singleitem = self.table.item(_row, _columns).text()
             _rowContent.append(_singleitem)
         self.__updateMyItems(self.__mapViewToDbFormat(_rowContent))
+        self.setTabTextUnsaved()
+
 
     ## The Row can be addet to the data list, to be saved to database
     #  @brief Such data as ID, SectioID and category is copiet to the new row
     def newRow(self) :
         _row = self.table.rowCount()
-        originID = str(int(self.table.item(_row - 1, 0).text()) + 1)
+        originID = ""
+        #originID = str(int(self.table.item(_row - 1, 0).text()) + 1)
         sectionID = self.table.item(_row - 1, 1).text()
         category = self.table.item(_row - 1, 4).text()
         self.table.insertRow(_row)
@@ -135,26 +143,31 @@ class DataView :
 
     ## Remove row from view and store deleted ID
     def rmRow(self) :
-        _row = self.selectedRow() + 1
-        if _row != None :
-            logging.info('Remove row : ' + str(_row))
-            self.table.removeRow(_row - 1)
-            if _row not in self.itemsDeleted :
-                self.itemsDeleted.append(_row)
+        _row = self.selectedRow()
+        _singleitem = self.table.item(_row, 0).text()
+        if _singleitem not in self.itemsDeleted :
+            logging.info('Remove row : ' + str(_singleitem))
+            self.table.removeRow(_row)
+            self.itemsDeleted.append(_singleitem)
         else :
             logging.info('Select row to delete!')
 
     ## Selected row can be detected
     #  @return Selected row
     def selectedRow(self):
-        if self.table.selectionModel().hasSelection():
-            row =  self.table.selectionModel().selectedIndexes()[0].row()
-            return int(row)
+        if self.table.selectionModel().selectedIndexes() != [] :
+            row = self.table.selectionModel().selectedIndexes()[0].row()
+        else :
+            row = 0
+        return int(row)
 
     ## Selected column can be detected
     #  @return Selected column
     def selectedColumn(self):
-        column =  self.table.selectionModel().selectedIndexes()[0].column()
+        if self.table.selectionModel().selectedIndexes() != [] :
+            column = self.table.selectionModel().selectedIndexes()[0].column()
+        else :
+            column = 0
         return int(column)
 
     ## Updated row should be saved in itemsUpdated list
@@ -201,3 +214,21 @@ class DataView :
         for _item in range(self.columnCount) :
             _rowMapped.append(str(row[_columnMap[_item]]))
         return _rowMapped
+
+    def tabChanged(self, index) :
+        self.tabs.setCurrentIndex(index)
+        self.table = self.tabs.currentWidget()
+
+    def setTabTextUnsaved(self) :
+        _index = self.tabs.currentIndex()
+        _text = self.tabs.tabText(_index)
+        if "*" not in _text :
+            self.tabs.setTabText(_index, _text + " *")
+            self.tabs.tabBar().setTabTextColor(_index, Qt.red)
+
+    def setTabTextSaved(self) :
+        for index in range(self.tabs.count()) :
+            _text = self.tabs.tabText(index)
+            if "*" in _text :
+                self.tabs.setTabText(index, _text.replace(" *", ""))
+                self.tabs.tabBar().setTabTextColor(index, Qt.white)
