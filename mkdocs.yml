@@ -1,6 +1,7 @@
 site_name: flashy
 
 nav:
+    - Introduction: 'index.md'
     - Home: '../'
     - 'User Guide': 'README.md'
 plugins:
