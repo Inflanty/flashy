@@ -1,13 +1,4 @@
 site_name: flashy
-
-site_url: https://inflanty.github.io/flashy
-repo_name: flashy
-repo_url: https://github.com/Inflanty/flashy
-edit_uri: ""
-
-# change directory names here
-docs_dir: docs
-site_dir: site
 nav:
     - Home: index.md
     - About: about.md
