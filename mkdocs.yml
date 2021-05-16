@@ -1,5 +1,6 @@
 site_name: flashy
-nav:
-    - Home: index.md
-    - About: about.md
+
+plugins:
+    - search
+    - mkdocstrings
 theme: readthedocs
