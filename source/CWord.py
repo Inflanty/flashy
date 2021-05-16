@@ -1,12 +1,35 @@
-## @package CWord
-#  Documentation for this module.
-#
-#  This module is intended to record my progress in language
-#
-#  CWord module contain a class which handle :
-#  Database creation, fill in and data managing
-#  Notice that origin means single record in database, could be :
-#  Word OR Phrasal Verbs OR Idiom 
+# -*- coding: utf-8 -*-
+"""This module is intended to record my progress in language
+
+CWord module contain a class which handle :
+Database creation, fill in and data managing
+Notice that origin means single record in database, could be :
+Word OR Phrasal Verbs OR Idiom
+
+Example:
+    Examples can be given using either the ``Example`` or ``Examples``
+    sections. Sections support any reStructuredText formatting, including
+    literal blocks::
+
+        $ python example_google.py
+
+Section breaks are created by resuming unindented text. Section breaks
+are also implicitly created anytime a new section starts.
+
+Attributes:
+    Word Class manage connection to ``SQLite`` database.
+
+Todo:
+    * For module TODOs
+    * You have to also use ``sphinx.ext.todo`` extension
+
+.. _Google Python Style Guide:
+   http://google.github.io/styleguide/pyguide.html
+
+"""
+
+# Doc generate : 
+#  pydoc-markdown --server --open
 
 import sqlite3
 import csv
@@ -14,15 +37,16 @@ import time
 import CSVReader
 import logging
 
-## Documentation for a class.
-#
-#  Word class provide all neccessary functionalities for this module
 class Word:
-    """ Word constructor
-
-    name - name of the database to connect/create
-    """
     def __init__(self, name) :
+        """Word Class
+
+        Args:
+            name - name of the database to connect/create
+
+        Returns:
+            void
+        """
         self.name = "NONE"
         if name == 'mem' :
             self.name = ':memory:'
@@ -37,13 +61,22 @@ class Word:
         self.initDB()
     
     def __del__(self) :
-        """ Word destructor """
         self.closeConnection()
 
     def initDB(self) :
-        """ Database init
+        """Database init
 
         This method creates database if not exist, else - just pass.
+
+        Args:
+            none
+
+        Returns:
+            void
+
+        Raises:
+            OperationalError: If syntax is not correct.
+            DatabaseError: If file is not correct.
         """
         try :
             self.cursorDB.execute("""CREATE TABLE """ + self.tableName + """ (

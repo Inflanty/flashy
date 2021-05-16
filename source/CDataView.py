@@ -11,7 +11,9 @@ class DataView :
     """ DataView class to support database view
 
     The class can pull data from database and push to View Window (see push)
-    Class use database, directly from Word class from CWord, CStats is probably obsolete
+    This class doues not support editing data lecture by lecture
+        TODO: Each lecture should be in separate tab
+        NOTE: This class use CWord directly, no need to use CStats
 
     viewHorHeaders    - Horisontal header to be set in the window
     viewRowTemplate   - Template for a new row in Window
@@ -24,13 +26,6 @@ class DataView :
     itemsDeleted = []
 
     def __init__(self, database) :
-        """ DataView constructor
-
-        This class doues not support editing data lecture by lecture
-        TODO: Each lecture should be in separate tab
-        NOTE: This class use CWord directly, no need to use CStats
-        param database name of the database to edit
-        """
         if database == "NULL" or database == None :
             logging.error("Database not exist")
         else :
@@ -38,7 +33,6 @@ class DataView :
             self.makeView()
 
     def __del__(self) :
-        """ Class destructor """
         pass
 
     def makeView(self) :

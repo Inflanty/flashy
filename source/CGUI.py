@@ -8,9 +8,7 @@ import pyqtgraph as pg
 import pyqtgraph.examples
 
 from CMainWindow import Ui_MainWindow
-from CFileBrowser import Ui_FileBrowser
 from CWord import Word
-from CSVReader import MyWindow
 from CDataEdit import DataEdit
 from CDataNew import DataNew
 from CDataView import DataView
