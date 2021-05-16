@@ -1,5 +1,8 @@
 site_name: flashy
 
+nav:
+    - Home: '../'
+    - 'User Guide': 'README.md'
 plugins:
     - search
     - mkdocstrings
