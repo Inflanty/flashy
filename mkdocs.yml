@@ -2,7 +2,8 @@ site_name: flashy
 
 nav:
     - Introduction: 'index.md'
+theme:
+  name: "material"
 plugins:
     - search
     - mkdocstrings
-theme: readthedocs
