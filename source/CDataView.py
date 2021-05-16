@@ -126,7 +126,6 @@ class DataView :
         """
         _row = self.table.rowCount()
         originID = ""
-        #originID = str(int(self.table.item(_row - 1, 0).text()) + 1)
         sectionID = self.table.item(_row - 1, 1).text()
         category = self.table.item(_row - 1, 4).text()
         self.table.insertRow(_row)
@@ -261,3 +260,10 @@ class DataView :
             if "*" in _text :
                 self.tabs.setTabText(index, _text.replace(" *", ""))
                 self.tabs.tabBar().setTabTextColor(index, Qt.white)
+
+    def getDeleted(self) :
+        """ Get all deleted data """
+        _deleted = []
+        _deleted.extend(self.itemsDeleted)
+        self.itemsDeleted.clear()
+        return _deleted

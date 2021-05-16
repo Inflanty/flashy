@@ -8,8 +8,7 @@ import logging
 import re
 
 class DataEdit(DataView) :
-    __editItemsUpdate = DataView.itemsUpdated
-    __editItemsDeleted = DataView.itemsDeleted
+    __editItemsUpdate = []
     __tabList = []
 
     def makeViewTabs(self):
@@ -33,16 +32,14 @@ class DataEdit(DataView) :
         super().makeViewTabs()
 
     def getEdited(self) :
+        self.__editItemsUpdate.extend(DataView.itemsUpdated)
         for row in self.__editItemsUpdate :
             for index in range(len(DataView.itemsDeleted)) :
                 if DataView.itemsDeleted[index] in row[0] :
                     self.__editItemsUpdate.remove(row)
         self.setTabTextSaved()
+        DataView.itemsUpdated.clear()
         return self.__editItemsUpdate
-
-
-    def getDeleted(self) :
-        return self.__editItemsDeleted
 
     def pushClbk(self) :
         pass

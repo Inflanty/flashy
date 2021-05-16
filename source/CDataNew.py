@@ -8,18 +8,13 @@ import logging
 import re
 
 class DataNew(DataView) :
-    __newItemsDeleted = DataView.itemsDeleted
 
     def getEdited(self) :
-        self.__newItemsUpdate = DataView.itemsUpdated
         self.pull()
         self.setTabTextSaved()
         # Check the difference between __newItemsUpdate AND DataView.itemsUpdated
         # if some elements are different, we should take newest version
         return DataView.itemsUpdated
-
-    def getDeleted(self) :
-        return self.__newItemsDeleted
 
     ## Remove row from view and store deleted ID
     def rmRow(self) :

@@ -240,7 +240,7 @@ class Word:
         [4] Traslation of origin
         [5] Origin category
         """
-        if self.__checkRecord(row):
+        if self.__checkRecordSkipID(row):
             newID = self.getLastID() + 1
             if row[4] == "NULL" :
                 link = "https://www.diki.pl/slownik-angielskiego?q=" + str(row[1].lower()).replace(" ", "+")
@@ -474,4 +474,20 @@ class Word:
                 return True
         logging.error("Wrong row format : " +
                       "\n\tID : "           + row[0])
+        return False
+
+    def __checkRecordSkipID(self, row) :
+        """ The recors has to be check formatwise. Record can be imported without ID.
+        
+        before we can add it to the database
+        row - row to check
+        """
+        if len(row) == 5:
+            if  row[0].isdigit() and \
+                not any(map(str.isdigit, row[1])) and \
+                not any(map(str.isdigit, row[3])) and \
+                not any(map(str.isdigit, row[4])) :
+                return True
+        logging.error("Wrong row format : " +
+                      "\n\tFor origin : "   + row[1])
         return False
