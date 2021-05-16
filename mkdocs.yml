@@ -5,8 +5,6 @@ repo_name: flashy
 repo_url: https://github.com/Inflanty/flashy
 edit_uri: ""
 
-copyright: 'Copyright &copy; 2020 <a href="http://ivory.idyll.org/lab/">Lab for Data Intensive Biology</a> at UC Davis'
-
 # change directory names here
 docs_dir: doc
 site_dir: site
