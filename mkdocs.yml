@@ -6,7 +6,7 @@ repo_url: https://github.com/Inflanty/flashy
 edit_uri: ""
 
 # change directory names here
-docs_dir: doc
+docs_dir: docs
 site_dir: site
 nav:
     - Home: index.md
