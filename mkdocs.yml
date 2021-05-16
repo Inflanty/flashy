@@ -1,9 +1,11 @@
 site_name: flashy
 
-nav:
-    - Introduction: 'index.md'
 theme:
   name: "material"
 plugins:
     - search
     - mkdocstrings
+nav:
+    - Home: index.md
+    - Code Reference:
+        - Workflow: workflow-reference.md
