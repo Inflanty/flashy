@@ -155,11 +155,16 @@ class DataView :
     def rmRow(self) :
         """ Remove row from view and store deleted ID """
         _row = self.selectedRow()
-        _singleitem = self.table.item(_row, 0).text()
+        try :
+            _singleitem = self.table.item(_row, 0).text()
+        except AttributeError:
+            logging.info('Nothing to delete!')
+            return
         if _singleitem not in self.itemsDeleted :
             logging.info('Remove row : ' + str(_singleitem))
             self.table.removeRow(_row)
             self.itemsDeleted.append(_singleitem)
+            self.setTabTextUnsaved()
         else :
             logging.info('Select row to delete!')
 
