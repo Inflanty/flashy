@@ -155,7 +155,10 @@ class GUI :
         return progress
 
     def plotDatabaseUpdate(self) :
-        self.ui.graphicWidget.plot(self.__databaseGetRange(), self.__databaseShowProgress())
+        if self.__active == self.ui.graphicWidget :
+            self.ui.graphicWidget.plot(self.__databaseGetRange(), self.__databaseShowProgress())
+        else :
+            self.plotDatabase()
 
     def plotDatabaseClose(self) :
         self.ui.graphicWidget.close()
