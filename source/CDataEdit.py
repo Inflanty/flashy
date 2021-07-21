@@ -32,6 +32,7 @@ class DataEdit(DataView) :
         super().makeViewTabs()
 
     def getEdited(self) :
+        self.__editItemsUpdate.clear()
         self.__editItemsUpdate.extend(DataView.itemsUpdated)
         for row in self.__editItemsUpdate :
             for index in range(len(DataView.itemsDeleted)) :
@@ -40,9 +41,6 @@ class DataEdit(DataView) :
         self.setTabTextSaved()
         DataView.itemsUpdated.clear()
         return self.__editItemsUpdate
-
-    def pushClbk(self) :
-        pass
 
     def getNew(self) :
         pass

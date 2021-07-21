@@ -7,6 +7,13 @@ from PyQt5.QtGui import QKeySequence
 import logging
 import re
 
+## TODO: Before saving the function has to go through all elements in the itemsUpdated (see item ID)
+#        and check if there are some fields that was not entered. 
+#        only last element could be not enetered so maybe it is better to check only last element, but how ?
+#        it maybe could be done by checking current column/row ?
+#        but mabe it is not true, maybe not only last element could be not enetede, if user use noiw row shotcut,
+#        it might not capture a current item  ?????
+
 class DataView :
     """ DataView class to support database view
 
@@ -84,13 +91,6 @@ class DataView :
         self.table.cellChanged.connect(self.update)
         self.table.resizeColumnsToContents()
         self.table.resizeRowsToContents()
-        self.pushClbk()
-
-    def pushClbk(self) :
-        """ Data is push to tabs Callback
-        This method should be defined by subclass
-        """
-        pass
 
     def pull(self) :
         """ Data is pulled from view
